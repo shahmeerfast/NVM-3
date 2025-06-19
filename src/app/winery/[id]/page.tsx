@@ -12,11 +12,11 @@ import {
   FaClock,
   FaGlassCheers,
   FaWhatsapp,
+  FaUsers,
 } from "react-icons/fa";
 import { useParams } from "next/navigation";
 import { Button } from "@/components/buttons/button";
 import { Card } from "@/components/cards/card";
-import WineDetailsCard from "@/components/cards/wine-details-card";
 import BookingCalendar from "@/components/booking-calendar";
 import { Winery } from "@/app/interfaces";
 import Map from "@/components/map";
@@ -27,6 +27,9 @@ import axios from "axios";
 const WineryDetail = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [userLocation, setUserLocation] = useState<GeolocationCoordinates | null>(null);
+  const [selectedTastingOption, setSelectedTastingOption] = useState<string | null>(null);
+  const [selectedFoodPairingOption, setSelectedFoodPairingOption] = useState<string | null>(null);
+  const [selectedNumberOfPeople, setSelectedNumberOfPeople] = useState<number>(1);
   const { id } = useParams() as { id: string };
   const { itinerary, setItinerary } = useItinerary();
   const [winery, setWinery] = useState<Winery>(undefined as any);
@@ -34,10 +37,18 @@ const WineryDetail = () => {
 
   const addToItinerary = () => {
     if (!itinerary.includes(id as any)) {
-      setItinerary([...(itinerary as any), winery as any]);
+      const itineraryItem = {
+        ...winery,
+        selectedTastingOption: winery.tasting_info.tasting_options.find((opt) => opt.id === selectedTastingOption),
+        selectedFoodPairingOption: winery.tasting_info.food_pairing_options.find(
+          (opt) => opt.id === selectedFoodPairingOption
+        ),
+        selectedNumberOfPeople,
+      };
+      setItinerary([...(itinerary as any), itineraryItem as any]);
       toast.success(`${winery?.name} added to your itinerary!`);
     } else {
-      alert("Winery already in itinerary!");
+      toast.error("Winery already in itinerary!");
     }
   };
 
@@ -109,7 +120,7 @@ const WineryDetail = () => {
                 className="bg-wine-primary hover:bg-wine-primary/90 text-white px-8 py-6 text-lg"
                 onClick={addToItinerary}
               >
-                Book a Tasting
+                Add to Itinerary
               </Button>
             </div>
           </div>
@@ -159,7 +170,7 @@ const WineryDetail = () => {
               <div>
                 <h3 className="font-serif text-lg mb-1">Times</h3>
                 <p className="text-gray-600 text-sm capitalize">
-                  {winery?.tasting_info.available_times.join("\n")}
+                  {winery?.tasting_info.available_times.join(", ")}
                 </p>
               </div>
             </div>
@@ -190,7 +201,7 @@ const WineryDetail = () => {
           </Card>
         </div>
 
-        {/* Wine Details Section */}
+        {/* Tasting Experience Section */}
         <div className="bg-white rounded-xl p-8 shadow-lg">
           <div className="flex items-center gap-3 mb-8">
             <FaGlassCheers className="h-8 w-8 text-wine-primary" />
@@ -206,6 +217,10 @@ const WineryDetail = () => {
                     {winery?.tasting_info.number_of_wines_per_tasting[0]} -{" "}
                     {winery?.tasting_info.number_of_wines_per_tasting[1]} wines per tasting
                   </span>
+                </p>
+                <p className="flex items-center gap-2">
+                  <FaUsers className="text-wine-primary" />
+                  <span>Group size: {winery?.booking_info.number_of_people} people</span>
                 </p>
                 <div>
                   <h4 className="font-medium mb-3">Special Features:</h4>
@@ -238,24 +253,91 @@ const WineryDetail = () => {
           </div>
         </div>
 
-        {/* Featured Wines Section */}
+        {/* Tasting Options Section */}
         <div className="bg-white rounded-lg p-8 shadow-lg">
-          <h2 className="font-serif text-3xl mb-6 text-wine-primary">Featured Wines</h2>
+          <h2 className="font-serif text-3xl mb-6 text-wine-primary">Tasting Options</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {winery?.wine_details.map((wine) => (
-              <WineDetailsCard key={wine.wine_id} wine={wine} />
+            {winery?.tasting_info.tasting_options.map((option) => (
+              <Card key={option.id} className="p-6 hover:shadow-lg transition-all">
+                <h3 className="font-serif text-xl mb-2">{option.name}</h3>
+                <p className="text-gray-600 mb-4">{option.description}</p>
+                <p className="text-wine-primary font-medium">${option.price_per_guest} per guest</p>
+              </Card>
             ))}
           </div>
         </div>
 
-        {/* Booking Calendar */}
+        {/* Book a Tasting Section */}
         <div className="bg-white rounded-lg p-8 shadow-lg">
           <h2 className="font-serif text-3xl mb-6 text-wine-primary">Book a Tasting</h2>
-          <BookingCalendar
-            slots={winery?.booking_info.available_slots}
-            maxGuests={winery?.booking_info.max_guests_per_slot}
-            weekendMultiplier={winery?.booking_info.dynamic_pricing.weekend_multiplier}
-          />
+          <div className="space-y-6">
+            {/* Tasting Option Selection */}
+            <div>
+              <label className="text-sm text-gray-900 font-extrabold">Select Tasting Option</label>
+              <select
+                value={selectedTastingOption || ""}
+                onChange={(e) => setSelectedTastingOption(e.target.value)}
+                className="select select-bordered w-full mt-2 text-sm"
+              >
+                <option value="">Choose a tasting option</option>
+                {winery?.tasting_info.tasting_options.map((option) => (
+                  <option key={option.id} value={option.id}>
+                    {option.name} (${option.price_per_guest}/guest)
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Food Pairing Option Selection */}
+            <div>
+              <label className="text-sm text-gray-900 font-extrabold">Select Food Pairing (Optional)</label>
+              <select
+                value={selectedFoodPairingOption || ""}
+                onChange={(e) => setSelectedFoodPairingOption(e.target.value)}
+                className="select select-bordered w-full mt-2 text-sm"
+              >
+                <option value="">No food pairing</option>
+                {winery?.tasting_info.food_pairing_options.map((option) => (
+                  <option key={option.id} value={option.id}>
+                    {option.name} (${option.price})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Number of People Selection */}
+            <div>
+              <label className="text-sm text-gray-900 font-extrabold">Number of People</label>
+              <input
+                type="number"
+                min={1}
+                max={winery?.booking_info.max_guests_per_slot || 20}
+                value={selectedNumberOfPeople}
+                onChange={(e) => setSelectedNumberOfPeople(parseInt(e.target.value) || 1)}
+                className="input input-bordered w-full mt-2 text-sm"
+              />
+            </div>
+
+            {/* External Booking Link */}
+            {winery?.booking_info.external_booking_link && (
+              <div>
+                <Button
+                  className="bg-wine-primary hover:bg-wine-primary/90 text-white w-full py-6 text-lg"
+                  onClick={() => window.open(winery.booking_info.external_booking_link, "_blank")}
+                >
+                  Book via External Site
+                </Button>
+              </div>
+            )}
+
+            {/* Booking Calendar */}
+            <BookingCalendar
+              slots={winery?.booking_info.available_slots}
+              maxGuests={winery?.booking_info.max_guests_per_slot}
+              weekendMultiplier={winery?.booking_info.dynamic_pricing.weekend_multiplier}
+              
+            />
+          </div>
         </div>
 
         {/* Reviews Section */}
