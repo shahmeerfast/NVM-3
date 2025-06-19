@@ -49,7 +49,7 @@ export default function Home() {
           <Filter wineries={wineries} onFilterApply={setFilteredWineries} />
         </div>
 
-        <div className="col-span-3 sm:w-full space-y-6 lg:ml-10 mb-20">
+        <div className="col-span-3 space-y-6 lg:ml-10 mb-20">
           {filteredWineries.length === 0 ? (
             <p className="text-center text-lg text-gray-600">No wineries match your filters</p>
           ) : (

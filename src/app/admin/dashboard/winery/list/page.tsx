@@ -53,58 +53,79 @@ export default function WineryListPage() {
       <h1 className="text-3xl font-bold mb-6">Wineries</h1>
 
       {/* Winery List Table */}
-      <table className="min-w-full border rounded overflow-hidden shadow-sm">
-        <thead className="bg-gray-100">
-          <tr>
-            <th className="border px-4 py-2 text-left">Name</th>
-            <th className="border px-4 py-2 text-left">Location</th>
-            <th className="border px-4 py-2">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {wineries.map((winery: any) => (
-            <tr key={winery._id} className="hover:bg-gray-50">
-              <td className="border px-4 py-2">{winery.name}</td>
-              <td className="border px-4 py-2">{winery.location.address}</td>
-              <td className="border px-4 py-2 text-center">
-                <button
-                  className="mr-2 bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded"
-                  onClick={() => openModal(winery)}
-                >
-                  View Details
-                </button>
-                <button
-                  className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
-                  onClick={() => handleDelete(winery._id)}
-                >
-                  Delete
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
+<table className="min-w-full border-collapse border border-gray-200 rounded-lg shadow-md bg-white">
+  <thead className="bg-gray-200 text-gray-700">
+    <tr>
+      <th className="w-1/4 border border-gray-200 px-4 py-2 text-left text-sm font-semibold uppercase tracking-wider">
+        Name
+      </th>
+      <th className="w-1/2 border border-gray-200 px-4 py-2 text-left text-sm font-semibold uppercase tracking-wider">
+        Location
+      </th>
+      <th className="w-1/4 border border-gray-200 px-4 py-2 text-center text-sm font-semibold uppercase tracking-wider">
+        Actions
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    {wineries.map((winery: any, index: number) => (
+      <tr
+        key={winery._id}
+        className={`transition-colors duration-200 ${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'} hover:bg-gray-100`}
+      >
+        <td className="w-1/4 border border-gray-200 px-4 py-2 text-gray-800 text-sm truncate">
+          {winery.name}
+        </td>
+        <td className="w-1/2 border border-gray-200 px-4 py-2 text-gray-800 text-sm truncate">
+          {winery.location.address}
+        </td>
+        <td className="w-1/4 border border-gray-200 px-4 py-2 text-center">
+          <button
+            className="mr-2 bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-md shadow-sm transition-all duration-200 ease-in-out"
+            onClick={() => openModal(winery)}
+            title="View Details"
+          >
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+          </button>
+          <button
+            className="bg-red-600 hover:bg-red-700 text-white p-2 rounded-md shadow-sm transition-all duration-200 ease-in-out"
+            onClick={() => handleDelete(winery._id)}
+            title="Delete"
+          >
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+          </button>
+        </td>
+      </tr>
+    ))}
+  </tbody>
+</table>
       {/* Pagination Controls */}
-      <div className="flex justify-center items-center mt-6">
-        <button
-          className="px-4 py-2 bg-gray-300 rounded mr-2 disabled:opacity-50"
-          disabled={page === 1}
-          onClick={() => setPage(page - 1)}
-        >
-          Previous
-        </button>
-        <span>
-          Page {currentPage} of {totalPages}
-        </span>
-        <button
-          className="px-4 py-2 bg-gray-300 rounded ml-2 disabled:opacity-50"
-          disabled={page === totalPages}
-          onClick={() => setPage(page + 1)}
-        >
-          Next
-        </button>
-      </div>
+{data.totalWineries > limit && (
+  <div className="flex justify-center items-center mt-6">
+    <button
+      className="px-4 py-2 bg-gray-300 rounded mr-2 disabled:opacity-50"
+      disabled={page === 1}
+      onClick={() => setPage(page - 1)}
+    >
+      Previous
+    </button>
+    <span>
+      Page {currentPage} of {totalPages}
+    </span>
+    <button
+      className="px-4 py-2 bg-gray-300 rounded ml-2 disabled:opacity-50"
+      disabled={page === totalPages}
+      onClick={() => setPage(page + 1)}
+    >
+      Next
+    </button>
+  </div>
+)}
 
       {/* Winery Details Modal */}
       {modalOpen && selectedWinery && (
