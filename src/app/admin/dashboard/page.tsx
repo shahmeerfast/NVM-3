@@ -73,25 +73,48 @@ export default function Dashboard() {
       <h1>Bookings</h1>
       <hr />
       <div className="overflow-x-auto">
-        <table className="table table-zebra w-full">
-          <thead>
+        <table className="min-w-full border-collapse border border-gray-200 rounded-lg shadow-md bg-white">
+          <thead className="bg-gray-200 text-gray-700">
             <tr>
-              <th>Booking Id</th>
-              <th>User Name</th>
-              <th>Email</th>
-              <th>Booking Date</th>
-              <th>Status</th>
-              <th>Actions</th>
+              <th className="w-1/6 border border-gray-200 px-4 py-2 text-left text-sm font-semibold uppercase tracking-wider">
+                Booking Id
+              </th>
+              <th className="w-1/6 border border-gray-200 px-4 py-2 text-left text-sm font-semibold uppercase tracking-wider">
+                User Name
+              </th>
+              <th className="w-1/6 border border-gray-200 px-4 py-2 text-left text-sm font-semibold uppercase tracking-wider">
+                Email
+              </th>
+              <th className="w-1/4 border border-gray-200 px-4 py-2 text-left text-sm font-semibold uppercase tracking-wider">
+                Booking Date
+              </th>
+              <th className="w-1/6 border border-gray-200 px-4 py-2 text-left text-sm font-semibold uppercase tracking-wider">
+                Status
+              </th>
+              <th className="w-1/6 border border-gray-200 px-4 py-2 text-center text-sm font-semibold uppercase tracking-wider">
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody>
             {bookings && bookings.length > 0 ? (
               bookings.map((booking: any) => (
-                <tr key={booking._id}>
-                  <td className="font-mono">{booking._id}</td>
-                  <td>{booking.userId?.name || "N/A"}</td>
-                  <td>{booking.userId?.email || "N/A"}</td>
-                  <td>
+                <tr
+                  key={booking._id}
+                  className={`transition-colors duration-200 ${
+                    booking._id % 2 === 0 ? "bg-gray-50" : "bg-white"
+                  } hover:bg-gray-100`}
+                >
+                  <td className="w-1/6 border border-gray-200 px-4 py-2 text-gray-800 text-sm font-mono truncate">
+                    {booking._id}
+                  </td>
+                  <td className="w-1/6 border border-gray-200 px-4 py-2 text-gray-800 text-sm truncate">
+                    {booking.userId?.name || "N/A"}
+                  </td>
+                  <td className="w-1/6 border border-gray-200 px-4 py-2 text-gray-800 text-sm truncate">
+                    {booking.userId?.email || "N/A"}
+                  </td>
+                  <td className="w-1/4 border border-gray-200 px-4 py-2 text-gray-800 text-sm truncate">
                     {new Date(booking.createdAt).toLocaleString("en-US", {
                       weekday: "long",
                       year: "numeric",
@@ -102,21 +125,70 @@ export default function Dashboard() {
                       hour12: true,
                     })}
                   </td>
-                  <td className="capitalize">{booking.status}</td>
-                  <td>
-                    <div className="flex gap-2">
+                  <td className="w-1/6 border border-gray-200 px-4 py-2 text-gray-800 text-sm capitalize truncate">
+                    {booking.status}
+                  </td>
+                  <td className="w-1/6 border border-gray-200 px-4 py-2 text-center">
+                    <div className="flex justify-center gap-2">
                       {booking.status === "pending" && (
                         <>
-                          <button className="btn btn-sm btn-success" onClick={() => handleConfirm(booking._id)}>
-                            Confirm
+                          <button
+                            className="bg-green-600 hover:bg-green-700 text-white p-2 rounded-md shadow-sm transition-all duration-200 ease-in-out"
+                            onClick={() => handleConfirm(booking._id)}
+                            title="Confirm"
+                          >
+                            <svg
+                              className="h-5 w-5"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                            </svg>
                           </button>
-                          <button className="btn btn-sm btn-error" onClick={() => handleCancel(booking._id)}>
-                            Cancel
+                          <button
+                            className="bg-red-600 hover:bg-red-700 text-white p-2 rounded-md shadow-sm transition-all duration-200 ease-in-out"
+                            onClick={() => handleCancel(booking._id)}
+                            title="Cancel"
+                          >
+                            <svg
+                              className="h-5 w-5"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
                           </button>
                         </>
                       )}
-                      <button className="btn btn-sm btn-info" onClick={() => openModal(booking)}>
-                        View Details
+                      <button
+                        className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-md shadow-sm transition-all duration-200 ease-in-out"
+                        onClick={() => openModal(booking)}
+                        title="View Details"
+                      >
+                        <svg
+                          className="h-5 w-5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                          />
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                          />
+                        </svg>
                       </button>
                     </div>
                   </td>
@@ -124,7 +196,7 @@ export default function Dashboard() {
               ))
             ) : (
               <tr>
-                <td colSpan={6} className="text-center">
+                <td colSpan={6} className="border border-gray-200 px-4 py-2 text-center text-gray-800">
                   No bookings found.
                 </td>
               </tr>
@@ -134,21 +206,23 @@ export default function Dashboard() {
       </div>
 
       {/* Pagination Controls */}
-      <div className="mt-4 flex justify-center items-center gap-4">
-        <button className="btn btn-sm" disabled={page === 1} onClick={() => setPage((prev) => Math.max(prev - 1, 1))}>
-          Previous
-        </button>
-        <span>
-          Page {currentPage} of {totalPages}
-        </span>
-        <button
-          className="btn btn-sm"
-          disabled={page === totalPages}
-          onClick={() => setPage((prev) => (prev < totalPages ? prev + 1 : prev))}
-        >
-          Next
-        </button>
-      </div>
+      {totalPages > 1 && (
+        <div className="mt-4 flex justify-center items-center gap-4">
+          <button className="btn btn-sm" disabled={page === 1} onClick={() => setPage((prev) => Math.max(prev - 1, 1))}>
+            Previous
+          </button>
+          <span>
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            className="btn btn-sm"
+            disabled={page === totalPages}
+            onClick={() => setPage((prev) => (prev < totalPages ? prev + 1 : prev))}
+          >
+            Next
+          </button>
+        </div>
+      )}
 
       {/* Booking Details Modal */}
       {modalOpen && selectedBooking && (
