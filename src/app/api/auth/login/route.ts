@@ -7,7 +7,6 @@ export async function POST(req: Request) {
   try {
     await dbConnect();
     const { email, password } = await req.json();
-
     const user = await User.findOne({ email })
     if (!user) {
       return NextResponse.json({ error: "Invalid credentials" }, { status: 400 });
