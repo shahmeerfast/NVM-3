@@ -20,6 +20,6 @@ export const regions = [
 
 export const wineTypes = ["Red", "Rose", "White", "Sparkling", "Dessert"];
 
-export const specialFeatures = ["Free Tasting with Bottle Purchase", "In-Person Tour", "Food Pairing Available"];
+export const specialFeatures = ["Free Tasting with Bottle Purchase", "In-Person Tour", "Food Pairing Available", "Family-Friendly"];
 
 export const timeOptions = ["Morning", "Afternoon", "Evening"];
