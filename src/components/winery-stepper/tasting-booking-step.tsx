@@ -3,7 +3,7 @@ import { MultiDateTimePicker } from "../datetime-picker";
 import { TagInput } from "../tag-input";
 import { Winery } from "@/app/interfaces";
 import { MultipleImageUpload } from "../Multi-image-upload";
-import { regions, timeOptions, wineTypes } from "@/data/data";
+import { regions, timeOptions, wineTypes, specialFeatures } from "@/data/data";
 import { v4 as uuidv4 } from "uuid";
 
 type TastingBookingFormProps = {
@@ -59,10 +59,7 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
         ...prev,
         tasting_info: {
           ...prev.tasting_info,
-          tasting_options: [
-            ...prev.tasting_info.tasting_options,
-            { ...tastingOption, id: uuidv4() },
-          ],
+          tasting_options: [...prev.tasting_info.tasting_options, { ...tastingOption, id: uuidv4() }],
         },
       }));
       setTastingOption({ id: "", name: "", description: "", price_per_guest: 0 });
@@ -85,10 +82,7 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
         ...prev,
         tasting_info: {
           ...prev.tasting_info,
-          food_pairing_options: [
-            ...prev.tasting_info.food_pairing_options,
-            { ...foodPairingOption, id: uuidv4() },
-          ],
+          food_pairing_options: [...prev.tasting_info.food_pairing_options, { ...foodPairingOption, id: uuidv4() }],
         },
       }));
       setFoodPairingOption({ id: "", name: "", description: "", price: 0 });
@@ -160,7 +154,9 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
         <div className="mt-2">
           {formData.tasting_info.tasting_options.map((opt) => (
             <div key={opt.id} className="flex justify-between items-center p-2 border-b">
-              <span>{opt.name}: {opt.description} (${opt.price_per_guest}/guest)</span>
+              <span>
+                {opt.name}: {opt.description} (${opt.price_per_guest}/guest)
+              </span>
               <button type="button" className="btn btn-xs btn-error" onClick={() => removeTastingOption(opt.id)}>
                 Remove
               </button>
@@ -202,7 +198,9 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
         <div className="mt-2">
           {formData.tasting_info.food_pairing_options.map((opt) => (
             <div key={opt.id} className="flex justify-between items-center p-2 border-b">
-              <span>{opt.name}: {opt.description} (${opt.price})</span>
+              <span>
+                {opt.name}: {opt.description} (${opt.price})
+              </span>
               <button type="button" className="btn btn-xs btn-error" onClick={() => removeFoodPairingOption(opt.id)}>
                 Remove
               </button>
@@ -250,7 +248,7 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
         <div className="form-control">
           <label className="label">Available Times</label>
           <select
-            multiple
+            // multiple
             className="select select-bordered"
             value={formData.tasting_info.available_times}
             onChange={(e) => handleSelectChange(e, "available_times")}
@@ -265,7 +263,7 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
         <div className="form-control">
           <label className="label">Wine Types</label>
           <select
-            multiple
+            // multiple
             className="select select-bordered"
             value={formData.tasting_info.wine_types}
             onChange={(e) => handleSelectChange(e, "wine_types")}
@@ -307,16 +305,27 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
       </div>
       <div className="form-control">
         <label className="label">Special Features</label>
-        <TagInput
-          tags={formData.tasting_info.special_features}
-          onChange={(newTags) =>
+        <select
+          className="select select-bordered w-full"
+          value={formData.tasting_info.special_features[0] || ""}
+          onChange={(e) => {
+            const selectedValue = e.target.value;
             setFormData((prev) => ({
               ...prev,
-              tasting_info: { ...prev.tasting_info, special_features: newTags },
-            }))
-          }
-          placeholder="Add features"
-        />
+              tasting_info: {
+                ...prev.tasting_info,
+                special_features: selectedValue ? [selectedValue] : [],
+              },
+            }));
+          }}
+        >
+          <option value="">Select Special Feature</option>
+          {specialFeatures.map((feature) => (
+            <option key={feature} value={feature}>
+              {feature}
+            </option>
+          ))}
+        </select>
       </div>
 
       {/* AVA & Booking */}
