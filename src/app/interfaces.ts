@@ -11,6 +11,20 @@ interface ContactInfo {
   website: string;
 }
 
+interface TastingOption {
+  id: string;
+  name: string;
+  description: string;
+  price_per_guest: number;
+}
+
+interface FoodPairingOption {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+}
+
 interface TastingInfo {
   price_range: [number, number];
   available_times: string[];
@@ -18,6 +32,8 @@ interface TastingInfo {
   number_of_wines_per_tasting: [number, number];
   special_features: string[];
   food_pairings_available: boolean;
+  tasting_options: TastingOption[];
+  food_pairing_options: FoodPairingOption[];
 }
 
 interface WineDetail {
@@ -42,8 +58,10 @@ interface DynamicPricing {
 interface BookingInfo {
   booking_enabled: boolean;
   max_guests_per_slot: number;
+  number_of_people: number;
   dynamic_pricing: DynamicPricing;
   available_slots: string[];
+  external_booking_link?: string;
 }
 
 interface Amenities {

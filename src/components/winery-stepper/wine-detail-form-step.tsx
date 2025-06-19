@@ -52,11 +52,9 @@ export const WineDetailsForm: React.FC<WineDetailsFormProps> = ({ formData, setF
               <button type="button" className="btn btn-xs btn-error mr-2" onClick={() => removeWine(i)}>
                 Remove
               </button>
-
               {activeIndex === i ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
             </div>
           </div>
-
           <div className={`overflow-hidden transition-all duration-700 ${activeIndex === i ? "max-h-[1000px] p-4" : "max-h-0"}`}>
             <div className="form-control mt-2">
               <label className="label">Wine Name</label>

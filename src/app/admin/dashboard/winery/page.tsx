@@ -22,14 +22,18 @@ const initialState: Winery = {
     number_of_wines_per_tasting: [1, 2],
     special_features: [],
     food_pairings_available: false,
+    tasting_options: [],
+    food_pairing_options: [],
   },
   wine_details: [],
   ava: "",
   booking_info: {
     booking_enabled: false,
     max_guests_per_slot: 0,
+    number_of_people: 1,
     dynamic_pricing: { enabled: false, weekend_multiplier: 0 },
     available_slots: [],
+    external_booking_link: "",
   },
   amenities: { virtual_sommelier: false, augmented_reality_tours: false, handicap_accessible: false },
   user_reviews: [],
@@ -52,7 +56,7 @@ export default function WineryAdminStepperPage() {
     try {
       const filesUrls = await fileUpload(uploadedFiles);
       formData.images = filesUrls;
-
+      console.log("formdata", formData);
       await axios.post("/api/winery", formData);
 
       setFormData({ ...initialState });
