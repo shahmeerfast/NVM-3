@@ -7,6 +7,7 @@ export type Filters = {
   ava: string[];
   time: string;
   specialFeatures: string[];
+  numberOfPeople: [number, number];
 };
 
 export interface FilterState {
@@ -22,6 +23,7 @@ export const useFilterStore = create<FilterState>((set) => ({
     ava: [],
     time: "",
     specialFeatures: [],
+    numberOfPeople: [1, 20],
   },
   setFilters: (newFilters) =>
     set((state) => ({

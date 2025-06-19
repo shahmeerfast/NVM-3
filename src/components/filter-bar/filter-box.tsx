@@ -33,6 +33,12 @@ const Filter = ({ wineries, onFilterApply }: FilterProps) => {
         winery.tasting_info.number_of_wines_per_tasting[1] <= filters.numberOfWines[1]
     );
 
+    filtered = filtered.filter(
+      (winery) =>
+        winery.booking_info.number_of_people >= filters.numberOfPeople[0] &&
+        winery.booking_info.number_of_people <= filters.numberOfPeople[1]
+    );
+
     if (Object.values(filters.wineType).some((value) => value)) {
       filtered = filtered.filter((winery) =>
         Object.keys(filters.wineType).some(
@@ -70,7 +76,6 @@ const Filter = ({ wineries, onFilterApply }: FilterProps) => {
       filters.specialFeatures.push(feature);
     } else {
       const index = filters.specialFeatures.findIndex((spf) => spf === feature);
-      console.log({ index });
       filters.specialFeatures.splice(index, 1);
     }
     setFilters({ ...filters, specialFeatures: [...filters.specialFeatures] });
@@ -84,6 +89,7 @@ const Filter = ({ wineries, onFilterApply }: FilterProps) => {
       ava: [],
       time: "",
       specialFeatures: [],
+      numberOfPeople: [1, 20],
     });
     setShowResetModal(false);
   };

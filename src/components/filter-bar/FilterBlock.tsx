@@ -2,9 +2,10 @@ import { Range } from "react-range";
 import Select from "react-select";
 import { wineTypes, regions, timeOptions, specialFeatures } from "@/data/data";
 import React from "react";
+
 type Filters = {
-  priceRange: number[];
-  numberOfWines: number[];
+  priceRange: [number, number];
+  numberOfWines: [number, number];
   wineType: {
     red: boolean;
     white: boolean;
@@ -14,7 +15,9 @@ type Filters = {
   ava: string[];
   time: string;
   specialFeatures: string[];
+  numberOfPeople: [number, number];
 };
+
 interface FilterBlockProps {
   filters: Filters;
   handleFilterChange: (key: string, value: any) => void;
@@ -83,6 +86,33 @@ export const FilterBlock = ({
         <div className="flex justify-between text-xs">
           <span>{filters.numberOfWines[0]}</span>
           <span>{filters.numberOfWines[1]}</span>
+        </div>
+      </div>
+
+      {/* Number of People Filter */}
+      <div className="grid gap-4 mt-4">
+        <label className="text-sm text-gray-900 font-extrabold">Number of People</label>
+        <Range
+          step={1}
+          min={1}
+          max={20}
+          values={filters.numberOfPeople}
+          onChange={(newValues) => handleFilterChange("numberOfPeople", newValues)}
+          renderTrack={({ props, children }) => (
+            <div {...props} className="w-full h-1 bg-neutral-300 rounded-full">
+              {React.Children.map(children, (child, index) =>
+                React.isValidElement(child) ? React.cloneElement(child, { key: index }) : child
+              )}
+            </div>
+          )}
+          renderThumb={({ props }) => {
+            const { key, ...newProps } = props;
+            return <div {...newProps} className="w-4 h-4 bg-primary rounded-full shadow-lg focus:outline-none" />;
+          }}
+        />
+        <div className="flex justify-between text-xs">
+          <span>{filters.numberOfPeople[0]}</span>
+          <span>{filters.numberOfPeople[1]}</span>
         </div>
       </div>
 
