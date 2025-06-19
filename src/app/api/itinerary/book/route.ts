@@ -1,24 +1,59 @@
 import { getUserIdFromToken } from "@/lib/auth";
 import { dbConnect } from "@/lib/dbConnect";
 import BookingModel from "@/models/booking.model";
+import UserModel from "@/models/user.model"; // Assuming you have a UserModel
+import WineryModel from "@/models/winery.model"; // Assuming you have a WineryModel
 import { Types } from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
+import { sendBookingEmails } from "@/lib/email";
+
 
 export async function POST(req: NextRequest) {
-  const userId = await getUserIdFromToken();
-  if (!userId) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-  await dbConnect();
+  try {
+    const userId = await getUserIdFromToken();
+    if (!userId) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
-  const { data } = await req.json();
-  const booking = new BookingModel({ userId });
-  booking.wineries = data.map((winery: { wineryId: string; guests: number; dateTime: string }) => ({
-    wineryId: winery.wineryId,
-    datetime: winery.dateTime,
-    numberOfGuests: winery.guests,
-  }));
-  await booking.save();
+    await dbConnect();
 
-  return NextResponse.json({ message: "Booking created successfully" }, { status: 201 });
+    const { data } = await req.json();
+    if (!Array.isArray(data) || data.length === 0) {
+      return NextResponse.json({ message: "Invalid booking data" }, { status: 400 });
+    }
+
+    // Fetch user details
+    const user = await UserModel.findById(userId).select("name email");
+    if (!user) {
+      return NextResponse.json({ message: "User not found" }, { status: 404 });
+    }
+
+    const booking = new BookingModel({ userId });
+    booking.wineries = data.map((winery: { wineryId: string; guests: number; dateTime: string }) => ({
+      wineryId: winery.wineryId,
+      datetime: winery.dateTime,
+      numberOfGuests: winery.guests,
+    }));
+    await booking.save();
+
+    for (const winery of data) {
+      const wineryDetails = await WineryModel.findById(winery.wineryId).select("name contact_info.email");
+      if (wineryDetails) {
+        await sendBookingEmails(booking.toJSON(), {
+          wineryId: winery.wineryId,
+          datetime: winery.dateTime,
+          numberOfGuests: winery.guests,
+          wineryName: wineryDetails.name,
+          wineryEmail: wineryDetails.contact_info?.email,
+        }, user, "pending");
+      } else {
+        console.warn(`Winery not found for ID: ${winery.wineryId}`);
+      }
+    }
+
+    return NextResponse.json({ message: "Booking created successfully", booking: booking.toJSON() }, { status: 201 });
+  } catch (error) {
+    console.error("Error creating booking:", error);
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
+  }
 }
 
 export async function GET(req: NextRequest) {
