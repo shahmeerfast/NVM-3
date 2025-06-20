@@ -179,7 +179,7 @@ export default function WineryListPage() {
                   <h3 className="text-2xl font-semibold border-b pb-1 mb-4">Tasting Info</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <p>
-                      <span className="font-semibold">Price Range:</span> {selectedWinery.tasting_info.price_range.join(" - ")}
+                      <span className="font-semibold">Price:</span> {selectedWinery.tasting_info.price_range.join(" - ")}
                     </p>
                     <p>
                       <span className="font-semibold">Available Times:</span>{" "}

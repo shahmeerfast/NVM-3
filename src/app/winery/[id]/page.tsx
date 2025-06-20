@@ -180,7 +180,7 @@ const WineryDetail = () => {
                 <FaDollarSign className="h-6 w-6 text-wine-primary" />
               </div>
               <div>
-                <h3 className="font-serif text-lg mb-1">Price Range</h3>
+                <h3 className="font-serif text-lg mb-1">Price</h3>
                 <p className="text-gray-600 text-sm">
                   ${winery.tasting_info?.tasting_price?.toFixed(2) ?? "N/A"}
                 </p>
