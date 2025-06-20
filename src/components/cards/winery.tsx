@@ -65,15 +65,22 @@ export default function WineryBookingCard({ winery, onUpdate, onRemove }: Winery
     setSelections((prev) => ({ ...prev, [key]: value }));
   };
 
-  const handleFoodPairingChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedOptions = Array.from(e.target.selectedOptions, (option) => ({
-      name: option.value,
-      price: Number(option.dataset.price) || 0,
-    }));
-    setSelections((prev) => ({ ...prev, foodPairings: selectedOptions }));
-  };
+const handleFoodPairingChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const selectedValue = e.target.value;
 
-  // Reset food pairing selection on mount to ensure no default selection
+  if (!selectedValue) {
+    setSelections((prev) => ({ ...prev, foodPairings: [] }));
+    return;
+  }
+
+  const selectedOptions = Array.from(e.target.selectedOptions, (option) => ({
+    name: option.value,
+    price: Number(option.dataset.price) || 0,
+  }));
+
+  setSelections((prev) => ({ ...prev, foodPairings: selectedOptions }));
+};
+
   useEffect(() => {
     setSelections((prev) => ({ ...prev, foodPairings: [] }));
   }, [winery.tasting_info?.food_pairing_options]);
@@ -157,11 +164,10 @@ export default function WineryBookingCard({ winery, onUpdate, onRemove }: Winery
             <select
               className="select select-bordered w-full text-sm h-10"
               onChange={handleFoodPairingChange}
-              disabled={!(winery.tasting_info?.food_pairing_options?.length > 0)}
             >
               {winery.tasting_info?.food_pairing_options?.length > 0 ? (
                 <>
-                  <option value="" disabled>
+                  <option value="">
                     Select food pairings
                   </option>
                   {winery.tasting_info.food_pairing_options.map((option) => (
