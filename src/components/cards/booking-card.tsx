@@ -54,7 +54,6 @@ export default function BookingCard({ booking, onBookUber }: BookingCardProps) {
                       hour12: true,
                     })}
                   </span>
-                  <span className="text-gray-500">Guests: {wineryBooking.numberOfGuests}</span>
                 </li>
               );
             })}

@@ -136,7 +136,6 @@ const getCustomerEmailTemplate = (booking: any, status: string) => {
     <ul style="font-size:14px;color:#0e0e0e;">
       <li>Date: ${new Date(booking.date).toLocaleDateString()}</li>
       <li>Time: ${booking.time}</li>
-      <li>Guests: ${booking.guests}</li>
     </ul>
     <p style="font-size:14px;color:#0e0e0e;padding-top:20px;">Thank you for using our platform!</p>
   `;
@@ -152,7 +151,6 @@ const getWineryEmailTemplate = (booking: any, status: string) => {
       <li>Customer: ${booking.customerName}</li>
       <li>Date: ${new Date(booking.date).toLocaleDateString()}</li>
       <li>Time: ${booking.time}</li>
-      <li>Guests: ${booking.guests}</li>
     </ul>
   `;
   return EmailTemplate({ content, subject: `Booking ${status} Notification` });
@@ -169,7 +167,6 @@ const getAdminEmailTemplate = (booking: any, status: string) => {
       <li>Customer: ${booking.customerName}</li>
       <li>Date: ${new Date(booking.date).toLocaleDateString()}</li>
       <li>Time: ${booking.time}</li>
-      <li>Guests: ${booking.guests}</li>
     </ul>
   `;
   return EmailTemplate({ content, subject: `Admin: Booking ${status} - ${booking._id}` });
@@ -194,7 +191,6 @@ export async function sendBookingEmails(booking: any, winery: any, user: any, st
       wineryEmail: winery.wineryEmail,
       date: date,
       time: time.split(":").slice(0, 2).join(":"), // Extract HH:mm
-      guests: winery.numberOfGuests || 0,
     };
 
     // Fetch admin users

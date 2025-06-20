@@ -278,9 +278,6 @@ export default function Dashboard() {
                           hour12: true,
                         })}
                       </p>
-                      <p>
-                        <strong>Number of Guests:</strong> {winery.numberOfGuests}
-                      </p>
                     </div>
                   ))
                 ) : (

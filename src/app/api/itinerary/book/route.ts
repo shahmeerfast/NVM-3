@@ -22,12 +22,14 @@ export async function POST(req: NextRequest) {
 
     // Fetch user details
     const user = await UserModel.findById(userId).select("name email");
+        console.log("test", user);
+
     if (!user) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
 
     const booking = new BookingModel({ userId });
-    booking.wineries = data.map((winery: { wineryId: string; guests: number; dateTime: string }) => ({
+    booking.wineries = data.map((winery: { wineryId: string; dateTime: string }) => ({
       wineryId: winery.wineryId,
       datetime: winery.dateTime,
     }));

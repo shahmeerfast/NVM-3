@@ -26,9 +26,8 @@ export default function ItineraryPage() {
   const handleUpdate = (id: string, data: { selectedDate: any; selectedTime: any }) => {
     const winery = itinerary.find((winery) => winery._id === id);
     if (!winery) return;
-    console.log(data);
 
-    winery.bookingDetails = { selectedDateTime: data.selectedTime, guests: 1 };
+    winery.bookingDetails = { selectedDateTime: data.selectedTime };
     setItinerary([...itinerary]);
   };
 
@@ -64,7 +63,6 @@ export default function ItineraryPage() {
     if (!user) return setShowAuthModal(true);
     const data = itinerary.map((winery) => ({
       wineryId: winery._id,
-      guests: `1`,
       dateTime: winery.bookingDetails.selectedDateTime,
     }));
     try {

@@ -2,7 +2,7 @@
 import { Winery } from "@/app/interfaces";
 import { createContext, useContext, useState, ReactNode } from "react";
 
-export type ItineraryWinery = Winery & { bookingDetails: { selectedDateTime: string; guests: number } };
+export type ItineraryWinery = Winery & { bookingDetails: { selectedDateTime: string } };
 interface ItineraryContextType {
   itinerary: ItineraryWinery[];
   setItinerary: React.Dispatch<React.SetStateAction<ItineraryWinery[]>>;
