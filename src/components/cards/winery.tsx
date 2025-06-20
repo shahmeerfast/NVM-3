@@ -42,7 +42,6 @@ export default function WineryBookingCard({ winery, onUpdate, onRemove }: Winery
   }, [selectedDate, availableSlots]);
 
   useEffect(() => {
-    // Always update the itinerary with current selections, even without date/time
     onUpdate(winery._id || winery.name, {
       selectedDate,
       selectedTime,
@@ -74,6 +73,11 @@ export default function WineryBookingCard({ winery, onUpdate, onRemove }: Winery
     setSelections((prev) => ({ ...prev, foodPairings: selectedOptions }));
   };
 
+  // Reset food pairing selection on mount to ensure no default selection
+  useEffect(() => {
+    setSelections((prev) => ({ ...prev, foodPairings: [] }));
+  }, [winery.tasting_info?.food_pairing_options]);
+
   return (
     <div className="card shadow-sm bg-white rounded-xl p-4 md:p-6 flex flex-col md:flex-row gap-4 items-start w-full">
       <div className="flex-grow bg-white w-full">
@@ -89,13 +93,11 @@ export default function WineryBookingCard({ winery, onUpdate, onRemove }: Winery
         <p className="text-xs text-gray-500">{winery.location?.address ?? "Address not available"}</p>
 
         <div className="flex items-center justify-between text-sm text-gray-700 mt-2 gap-2">
-          <span className="flex items-center gap-1">💰 Tasting: ${winery.tasting_info?.tasting_price?.toFixed(2) ?? "N/A"}</span>
           <span className="flex items-center gap-1">
-            ⏰{" "}
-            {availableTimes
-              .slice(0, 3)
-              .map((time) => new Date(time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }))
-              .join(", ") || "No times available"}
+            💰 Tasting: ${winery.tasting_info?.tasting_price?.toFixed(2) ?? "N/A"}
+          </span>
+          <span className="flex items-center gap-1">
+            ⏰ {availableTimes.slice(0, 3).map((time) => new Date(time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })).join(", ") || "No times available"}
             {availableTimes.length > 3 && "..."}
           </span>
         </div>
@@ -150,21 +152,31 @@ export default function WineryBookingCard({ winery, onUpdate, onRemove }: Winery
             </select>
           </div>
 
-          {winery.tasting_info?.food_pairing_options?.length > 0 && (
-            <div className="w-full md:w-1/3">
-              <label className="block text-xs font-medium text-gray-600">Food Pairings</label>
-              <select className="select select-bordered w-full text-sm h-10" onChange={handleFoodPairingChange}>
-             <option value="" disabled>
-                Select a time
-              </option>
-                {winery.tasting_info.food_pairing_options.map((option) => (
-                  <option key={option.name} value={option.name} data-price={option.price}>
-                    {option.name} (${option.price.toFixed(2)})
+          <div className="w-full md:w-1/3">
+            <label className="block text-xs font-medium text-gray-600">Food Pairings</label>
+            <select
+              className="select select-bordered w-full text-sm h-10"
+              onChange={handleFoodPairingChange}
+              disabled={!(winery.tasting_info?.food_pairing_options?.length > 0)}
+            >
+              {winery.tasting_info?.food_pairing_options?.length > 0 ? (
+                <>
+                  <option value="" disabled>
+                    Select food pairings
                   </option>
-                ))}
-              </select>
-            </div>
-          )}
+                  {winery.tasting_info.food_pairing_options.map((option) => (
+                    <option key={option.name} value={option.name} data-price={option.price}>
+                      {option.name} (${option.price.toFixed(2)})
+                    </option>
+                  ))}
+                </>
+              ) : (
+                <option value="" disabled>
+                  No pairings available
+                </option>
+              )}
+            </select>
+          </div>
         </div>
       </div>
     </div>
