@@ -2,7 +2,16 @@
 import { Winery } from "@/app/interfaces";
 import { createContext, useContext, useState, ReactNode } from "react";
 
-export type ItineraryWinery = Winery & { bookingDetails: { selectedDateTime: string } };
+export interface BookingData {
+  selectedDate: string;
+  selectedTime: string;
+  tasting: boolean;
+  tour: boolean;
+  foodPairings: { name: string; price: number }[];
+}
+
+export type ItineraryWinery = Winery & { bookingDetails?: BookingData };
+
 interface ItineraryContextType {
   itinerary: ItineraryWinery[];
   setItinerary: React.Dispatch<React.SetStateAction<ItineraryWinery[]>>;

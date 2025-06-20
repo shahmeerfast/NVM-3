@@ -1,34 +1,41 @@
 "use client";
 import { useEffect, useState } from "react";
 import ItinerarySummary from "@/components/Itinerary-summary";
-import { useItinerary } from "@/store/itinerary";
+import { useItinerary, BookingData, ItineraryWinery } from "@/store/itinerary";
 import AuthModal from "@/components/modal/AuthModal";
-import { useAuthStore } from "@/store/authStore";
 import { Car, Loader2, Wine } from "lucide-react";
 import { Button } from "@/components/buttons/button";
 import Modal from "@/components/modal";
 import { useRouter } from "next/navigation";
 import WineryBookingCard from "@/components/cards/winery";
-import { it } from "node:test";
 import axios from "axios";
-import { set } from "mongoose";
+import { useAuthStore } from "@/store/authStore";
 
 export default function ItineraryPage() {
   const [isLottieLoaded, setIsLottieLoaded] = useState(false);
   const { itinerary, setItinerary } = useItinerary();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showRideModal, setShowRideModal] = useState(false);
-  const [currentLocation, setCurrentLocation] = useState<any | null>(null);
+  const [currentLocation, setCurrentLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const [loadingLocation, setLoadingLocation] = useState(false);
   const { user } = useAuthStore();
   const router = useRouter();
 
-  const handleUpdate = (id: string, data: { selectedDate: any; selectedTime: any }) => {
-    const winery = itinerary.find((winery) => winery._id === id);
-    if (!winery) return;
+  const handleUpdate = (id: string, data: BookingData) => {
+    const updatedItinerary = itinerary.map((winery) => {
+      if ((winery._id || winery.name) === id) {
+        // Only update if bookingDetails has changed
+        if (JSON.stringify(winery.bookingDetails) !== JSON.stringify(data)) {
+          return { ...winery, bookingDetails: data };
+        }
+      }
+      return winery;
+    });
 
-    winery.bookingDetails = { selectedDateTime: data.selectedTime };
-    setItinerary([...itinerary]);
+    // Only call setItinerary if there are actual changes
+    if (JSON.stringify(updatedItinerary) !== JSON.stringify(itinerary)) {
+      setItinerary(updatedItinerary);
+    }
   };
 
   const handleRemove = (id: string) => setItinerary(itinerary.filter((winery) => winery._id !== id));
@@ -63,7 +70,10 @@ export default function ItineraryPage() {
     if (!user) return setShowAuthModal(true);
     const data = itinerary.map((winery) => ({
       wineryId: winery._id,
-      dateTime: winery.bookingDetails.selectedDateTime,
+      dateTime: winery.bookingDetails?.selectedTime,
+      tasting: winery.bookingDetails?.tasting && winery.tasting_info?.tasting_price ? winery.tasting_info.tasting_price : null,
+      tour: winery.bookingDetails?.tour && winery.tours?.tour_price ? winery.tours.tour_price : null,
+      foodPairings: winery.bookingDetails?.foodPairings || [],
     }));
     try {
       const response = await axios.post("/api/itinerary/book", { data });
@@ -71,7 +81,8 @@ export default function ItineraryPage() {
         setShowRideModal(true);
       }
     } catch (error: any) {
-      alert("Failed to confirm booking. Please try again later. " + error.message);
+      console.error("Booking error:", error);
+      alert("Failed to confirm booking. Please try again later.");
     }
   };
 
@@ -87,13 +98,6 @@ export default function ItineraryPage() {
       openRideLink(service, currentLocation);
     }
   };
-  useEffect(() => {
-    if (itinerary.length > 0) {
-      itinerary.sort(
-        (a, b) => new Date(a.bookingDetails?.selectedDateTime).getTime() - new Date(b.bookingDetails?.selectedDateTime).getTime()
-      );
-    }
-  }, [itinerary]);
 
   const openRideLink = (service: "uber" | "lyft", location: { latitude: number; longitude: number }) => {
     const earliestWinery = itinerary[0];
@@ -110,6 +114,19 @@ export default function ItineraryPage() {
     }
     window.open(rideURL, "_blank");
   };
+
+  // Sort itinerary without causing infinite loop
+  useEffect(() => {
+    const sortedItinerary = [...itinerary].sort((a, b) => {
+      const timeA = a.bookingDetails?.selectedTime ? new Date(a.bookingDetails.selectedTime).getTime() : Infinity;
+      const timeB = b.bookingDetails?.selectedTime ? new Date(b.bookingDetails.selectedTime).getTime() : Infinity;
+      return timeA - timeB;
+    });
+    // Only update if the order has changed to prevent infinite loop
+    if (JSON.stringify(sortedItinerary) !== JSON.stringify(itinerary)) {
+      setItinerary(sortedItinerary);
+    }
+  }, [itinerary, setItinerary]);
 
   return (
     <div className="bg-gray-100 min-h-screen py-12 px-4 sm:px-6 lg:px-8 relative md:top-10 top-5">
@@ -130,7 +147,7 @@ export default function ItineraryPage() {
           <div className="flex gap-10 flex-wrap lg:flex-nowrap mb-10">
             <div className="lg:w-4/5 w-full">
               {itinerary.map((winery) => (
-                <div key={winery._id} className="mb-4 w-full">
+                <div key={winery._id || winery.name} className="mb-4 w-full">
                   <WineryBookingCard winery={winery} onUpdate={handleUpdate} onRemove={handleRemove} />
                 </div>
               ))}
@@ -161,7 +178,6 @@ export default function ItineraryPage() {
       >
         <div className="flex flex-col items-center p-0">
           {!isLottieLoaded && <Loader2 className="w-8 h-8 text-gray-500 animate-spin mb-4" />}
-
           <iframe
             src="https://lottie.host/embed/303f3d0b-e50a-4592-894a-474164e44c5d/f4rpyUChZF.lottie"
             className={`transition-opacity duration-300 ${isLottieLoaded ? "opacity-100" : "opacity-0"}`}
@@ -177,11 +193,8 @@ export default function ItineraryPage() {
               </p>
 
               <p className="text-gray-500 text-sm mt-4 text-center">
-                A confirmation email has been sent to{" "}
-                <strong>
-                  (<em>{user?.email}</em>)
-                </strong>{" "}
-                with all your booking details. Be sure to check your schedule and arrive on time for your reservations.
+                A confirmation email has been sent to <strong>{user?.email || "your email"}</strong> with all your booking
+                details. Be sure to check your schedule and arrive on time for your reservations.
               </p>
 
               <div className="border-t w-full my-4"></div>
