@@ -1,10 +1,8 @@
 import { ChangeEvent, useState } from "react";
 import { MultiDateTimePicker } from "../datetime-picker";
-import { TagInput } from "../tag-input";
 import { Winery } from "@/app/interfaces";
 import { MultipleImageUpload } from "../Multi-image-upload";
 import { regions, timeOptions, wineTypes, specialFeatures } from "@/data/data";
-import { v4 as uuidv4 } from "uuid";
 
 type TastingBookingFormProps = {
   formData: Winery;
@@ -23,13 +21,29 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
   availableSlotDates,
   setAvailableSlotDates,
 }) => {
-  const [tastingOption, setTastingOption] = useState({ id: "", name: "", description: "", price_per_guest: 0 });
-  const [foodPairingOption, setFoodPairingOption] = useState({ id: "", name: "", description: "", price: 0 });
+  const [foodPairingOption, setFoodPairingOption] = useState({ name: "", price: 0 });
 
-  const handlePriceChange = (field: "min" | "max", value: string) => {
-    const num = parseFloat(value);
-    formData.tasting_info.price_range[field === "min" ? 0 : 1] = num;
-    setFormData({ ...formData });
+  const handleTastingPriceChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const value = parseFloat(e.target.value) || 0;
+    setFormData((prev) => ({
+      ...prev,
+      tasting_info: { ...prev.tasting_info, tasting_price: value },
+    }));
+  };
+
+  const handleTourAvailabilityChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setFormData((prev) => ({
+      ...prev,
+      tours: { ...prev.tours, available: e.target.checked, tour_price: e.target.checked ? prev.tours.tour_price : 0 },
+    }));
+  };
+
+  const handleTourPriceChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const value = parseFloat(e.target.value) || 0;
+    setFormData((prev) => ({
+      ...prev,
+      tours: { ...prev.tours, tour_price: value },
+    }));
   };
 
   const handleSelectChange = (e: ChangeEvent<HTMLSelectElement>, field: "available_times" | "wine_types") => {
@@ -42,7 +56,10 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
 
   const updateSlotDates = (dates: Date[]) => {
     setAvailableSlotDates(dates);
-    setFormData({ ...formData, booking_info: { ...formData.booking_info, available_slots: dates.map((d) => d.toISOString()) } });
+    setFormData((prev) => ({
+      ...prev,
+      booking_info: { ...prev.booking_info, available_slots: dates.map((d) => d.toISOString()) },
+    }));
   };
 
   const handleNumberOfPeopleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -53,48 +70,25 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
     }));
   };
 
-  const addTastingOption = () => {
-    if (tastingOption.name && tastingOption.description && tastingOption.price_per_guest >= 0) {
-      setFormData((prev) => ({
-        ...prev,
-        tasting_info: {
-          ...prev.tasting_info,
-          tasting_options: [...prev.tasting_info.tasting_options, { ...tastingOption, id: uuidv4() }],
-        },
-      }));
-      setTastingOption({ id: "", name: "", description: "", price_per_guest: 0 });
-    }
-  };
-
-  const removeTastingOption = (id: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      tasting_info: {
-        ...prev.tasting_info,
-        tasting_options: prev.tasting_info.tasting_options.filter((opt) => opt.id !== id),
-      },
-    }));
-  };
-
   const addFoodPairingOption = () => {
-    if (foodPairingOption.name && foodPairingOption.description && foodPairingOption.price >= 0) {
+    if (foodPairingOption.name && foodPairingOption.price >= 0) {
       setFormData((prev) => ({
         ...prev,
         tasting_info: {
           ...prev.tasting_info,
-          food_pairing_options: [...prev.tasting_info.food_pairing_options, { ...foodPairingOption, id: uuidv4() }],
+          food_pairing_options: [...prev.tasting_info.food_pairing_options, { ...foodPairingOption }],
         },
       }));
-      setFoodPairingOption({ id: "", name: "", description: "", price: 0 });
+      setFoodPairingOption({ name: "", price: 0 });
     }
   };
 
-  const removeFoodPairingOption = (id: string) => {
+  const removeFoodPairingOption = (index: number) => {
     setFormData((prev) => ({
       ...prev,
       tasting_info: {
         ...prev.tasting_info,
-        food_pairing_options: prev.tasting_info.food_pairing_options.filter((opt) => opt.id !== id),
+        food_pairing_options: prev.tasting_info.food_pairing_options.filter((_, i) => i !== index),
       },
     }));
   };
@@ -121,70 +115,61 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
         />
       </div>
 
-      {/* Tasting Options */}
+      {/* Wine Tasting Price */}
       <div className="form-control">
-        <label className="label">Tasting Options</label>
-        <div className="space-y-2">
+        <label className="label">Wine Tasting Price</label>
+        <input
+          type="number"
+          placeholder="Enter fixed price for tasting (e.g., 100)"
+          className="input input-bordered"
+          value={formData.tasting_info.tasting_price || ""}
+          onChange={handleTastingPriceChange}
+          min={0}
+          step="0.01"
+        />
+      </div>
+
+      {/* Tours */}
+      <div className="form-control">
+        <label className="cursor-pointer label">
+          <span className="label-text">Offer Tours?</span>
           <input
-            type="text"
-            placeholder="Tasting Name (e.g., Vintage Tasting)"
-            className="input input-bordered w-full"
-            value={tastingOption.name}
-            onChange={(e) => setTastingOption({ ...tastingOption, name: e.target.value })}
+            type="checkbox"
+            checked={formData.tours.available}
+            onChange={handleTourAvailabilityChange}
+            className="checkbox"
           />
-          <textarea
-            placeholder="Description (e.g., Includes X, Y, and Z)"
-            className="textarea textarea-bordered w-full"
-            value={tastingOption.description}
-            onChange={(e) => setTastingOption({ ...tastingOption, description: e.target.value })}
-          />
-          <input
-            type="number"
-            placeholder="Price per Guest"
-            className="input input-bordered w-full"
-            value={tastingOption.price_per_guest || ""}
-            onChange={(e) => setTastingOption({ ...tastingOption, price_per_guest: parseFloat(e.target.value) || 0 })}
-            min={0}
-            step="0.01"
-          />
-          <button type="button" className="btn btn-primary" onClick={addTastingOption}>
-            Add Tasting Option
-          </button>
-        </div>
-        <div className="mt-2">
-          {formData.tasting_info.tasting_options.map((opt) => (
-            <div key={opt.id} className="flex justify-between items-center p-2 border-b">
-              <span>
-                {opt.name}: {opt.description} (${opt.price_per_guest}/guest)
-              </span>
-              <button type="button" className="btn btn-xs btn-error" onClick={() => removeTastingOption(opt.id)}>
-                Remove
-              </button>
-            </div>
-          ))}
-        </div>
+        </label>
+        {formData.tours.available && (
+          <div className="form-control mt-2">
+            <label className="label">Tour Price</label>
+            <input
+              type="number"
+              placeholder="Enter fixed price for tour (e.g., 50)"
+              className="input input-bordered"
+              value={formData.tours.tour_price || ""}
+              onChange={handleTourPriceChange}
+              min={0}
+              step="0.01"
+            />
+          </div>
+        )}
       </div>
 
       {/* Food Pairing Options */}
       <div className="form-control">
-        <label className="label">Food Pairing Options</label>
+        <label className="label">Food Pairing or Platter Options</label>
         <div className="space-y-2">
           <input
             type="text"
-            placeholder="Food Pairing Name"
+            placeholder="Name (e.g., Cheese Platter)"
             className="input input-bordered w-full"
             value={foodPairingOption.name}
             onChange={(e) => setFoodPairingOption({ ...foodPairingOption, name: e.target.value })}
           />
-          <textarea
-            placeholder="Description"
-            className="textarea textarea-bordered w-full"
-            value={foodPairingOption.description}
-            onChange={(e) => setFoodPairingOption({ ...foodPairingOption, description: e.target.value })}
-          />
           <input
             type="number"
-            placeholder="Price"
+            placeholder="Price (e.g., 30)"
             className="input input-bordered w-full"
             value={foodPairingOption.price || ""}
             onChange={(e) => setFoodPairingOption({ ...foodPairingOption, price: parseFloat(e.target.value) || 0 })}
@@ -192,16 +177,16 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
             step="0.01"
           />
           <button type="button" className="btn btn-primary" onClick={addFoodPairingOption}>
-            Add Food Pairing Option
+            Add Food Pairing/Platter
           </button>
         </div>
         <div className="mt-2">
-          {formData.tasting_info.food_pairing_options.map((opt) => (
-            <div key={opt.id} className="flex justify-between items-center p-2 border-b">
+          {formData.tasting_info.food_pairing_options.map((opt, index) => (
+            <div key={index} className="flex justify-between items-center p-2 border-b">
               <span>
-                {opt.name}: {opt.description} (${opt.price})
+                {opt.name}: ${opt.price}
               </span>
-              <button type="button" className="btn btn-xs btn-error" onClick={() => removeFoodPairingOption(opt.id)}>
+              <button type="button" className="btn btn-xs btn-error" onClick={() => removeFoodPairingOption(index)}>
                 Remove
               </button>
             </div>
@@ -221,34 +206,12 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
         />
       </div>
 
-      {/* Existing Tasting Info */}
-      <div className="grid grid-cols-2 gap-4">
-        <div className="form-control">
-          <label className="label">Price Range (Min)</label>
-          <input
-            type="number"
-            placeholder="Min"
-            className="input input-bordered"
-            value={formData.tasting_info.price_range[0] || ""}
-            onChange={(e) => handlePriceChange("min", e.target.value)}
-          />
-        </div>
-        <div className="form-control">
-          <label className="label">Price Range (Max)</label>
-          <input
-            type="number"
-            placeholder="Max"
-            className="input input-bordered"
-            value={formData.tasting_info.price_range[1] || ""}
-            onChange={(e) => handlePriceChange("max", e.target.value)}
-          />
-        </div>
-      </div>
+      {/* Tasting Info */}
       <div className="grid grid-cols-2 gap-4">
         <div className="form-control">
           <label className="label">Available Times</label>
           <select
-            // multiple
+            multiple
             className="select select-bordered"
             value={formData.tasting_info.available_times}
             onChange={(e) => handleSelectChange(e, "available_times")}
@@ -263,7 +226,7 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
         <div className="form-control">
           <label className="label">Wine Types</label>
           <select
-            // multiple
+            multiple
             className="select select-bordered"
             value={formData.tasting_info.wine_types}
             onChange={(e) => handleSelectChange(e, "wine_types")}
@@ -345,20 +308,6 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
             ))}
           </select>
         </div>
-        <label className="cursor-pointer label">
-          <span className="label-text">Food Pairings Available?</span>
-          <input
-            type="checkbox"
-            checked={formData.tasting_info.food_pairings_available}
-            onChange={(e) =>
-              setFormData((prev) => ({
-                ...prev,
-                tasting_info: { ...prev.tasting_info, food_pairings_available: e.target.checked },
-              }))
-            }
-            className="checkbox"
-          />
-        </label>
       </div>
 
       <div className="form-control">

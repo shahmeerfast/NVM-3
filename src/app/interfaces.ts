@@ -11,29 +11,23 @@ interface ContactInfo {
   website: string;
 }
 
-interface TastingOption {
-  id: string;
-  name: string;
-  description: string;
-  price_per_guest: number;
-}
-
 interface FoodPairingOption {
-  id: string;
   name: string;
-  description: string;
   price: number;
 }
 
 interface TastingInfo {
-  price_range: [number, number];
+  tasting_price: number;
   available_times: string[];
   wine_types: string[];
   number_of_wines_per_tasting: [number, number];
   special_features: string[];
-  food_pairings_available: boolean;
-  tasting_options: TastingOption[];
   food_pairing_options: FoodPairingOption[];
+}
+
+interface Tours {
+  available: boolean;
+  tour_price: number;
 }
 
 interface WineDetail {
@@ -91,6 +85,7 @@ export interface Winery {
   description: string;
   images: string[];
   tasting_info: TastingInfo;
+  tours: Tours;
   wine_details: WineDetail[];
   ava: string;
   booking_info: BookingInfo;
@@ -98,7 +93,6 @@ export interface Winery {
   user_reviews: UserReview[];
   transportation: Transportation;
 }
-
 
 
 

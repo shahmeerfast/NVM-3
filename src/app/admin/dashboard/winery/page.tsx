@@ -16,14 +16,16 @@ const initialState: Winery = {
   contact_info: { email: "", phone: "", website: "" },
   images: [],
   tasting_info: {
-    price_range: [0, 100],
+    tasting_price: 0, // Changed from price_range to single fixed price
     available_times: [],
     wine_types: [],
     number_of_wines_per_tasting: [1, 2],
     special_features: [],
-    food_pairings_available: false,
-    tasting_options: [],
-    food_pairing_options: [],
+    food_pairing_options: [], // Array to store food pairings or platters with name and price
+  },
+  tours: {
+    available: false,
+    tour_price: 0, // Fixed price for tour if available
   },
   wine_details: [],
   ava: "",
@@ -60,10 +62,8 @@ export default function WineryAdminStepperPage() {
       await axios.post("/api/winery", formData);
 
       setFormData({ ...initialState });
-
       setUploadedFiles([]);
       setAvailableSlotDates([]);
-
       setActiveStep(0);
       toast.success("Winery added successfully!", {
         position: "top-right",
@@ -113,14 +113,12 @@ export default function WineryAdminStepperPage() {
           <div className={`step ${activeStep >= 2 ? "step-primary" : ""}`}>Wine Details</div>
         </div>
 
-        {/* Loading spinner */}
         {loading && (
           <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex justify-center items-center z-50">
             <div className="loader border-t-4 border-b-4 border-white w-12 h-12 rounded-full animate-spin"></div>
           </div>
         )}
 
-        {/* Toast notification container */}
         <ToastContainer />
 
         <form ref={formRef} onSubmit={(e) => e.preventDefault()} className="space-y-6" id="winery-form">

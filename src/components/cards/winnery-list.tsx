@@ -49,7 +49,7 @@ const WineryCard: FC<WineryCardProps> = ({ winery, addToItinerary }) => {
           <div className="flex items-center space-x-2">
             <FaDollarSign className="text-wine-accent" />
             <p>
-              ${winery.tasting_info.price_range[0]}-{winery.tasting_info.price_range[1]}
+             ${winery.tasting_info?.tasting_price?.toFixed(2) ?? "N/A"}
             </p>
           </div>
 

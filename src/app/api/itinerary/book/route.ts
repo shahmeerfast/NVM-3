@@ -30,7 +30,6 @@ export async function POST(req: NextRequest) {
     booking.wineries = data.map((winery: { wineryId: string; guests: number; dateTime: string }) => ({
       wineryId: winery.wineryId,
       datetime: winery.dateTime,
-      numberOfGuests: winery.guests,
     }));
     await booking.save();
 
@@ -40,7 +39,6 @@ export async function POST(req: NextRequest) {
         await sendBookingEmails(booking.toJSON(), {
           wineryId: winery.wineryId,
           datetime: winery.dateTime,
-          numberOfGuests: winery.guests,
           wineryName: wineryDetails.name,
           wineryEmail: wineryDetails.contact_info?.email,
         }, user, "pending");

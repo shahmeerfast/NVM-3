@@ -8,6 +8,7 @@ export type Filters = {
   time: string;
   specialFeatures: string[];
   numberOfPeople: [number, number];
+  toursAvailable: boolean;
 };
 
 export interface FilterState {
@@ -24,6 +25,7 @@ export const useFilterStore = create<FilterState>((set) => ({
     time: "",
     specialFeatures: [],
     numberOfPeople: [1, 20],
+    toursAvailable: false,
   },
   setFilters: (newFilters) =>
     set((state) => ({

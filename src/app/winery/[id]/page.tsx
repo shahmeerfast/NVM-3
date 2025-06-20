@@ -39,9 +39,8 @@ const WineryDetail = () => {
     if (!itinerary.includes(id as any)) {
       const itineraryItem = {
         ...winery,
-        selectedTastingOption: winery.tasting_info.tasting_options.find((opt) => opt.id === selectedTastingOption),
         selectedFoodPairingOption: winery.tasting_info.food_pairing_options.find(
-          (opt) => opt.id === selectedFoodPairingOption
+          (opt) => opt.name === selectedFoodPairingOption
         ),
         selectedNumberOfPeople,
       };
@@ -183,7 +182,7 @@ const WineryDetail = () => {
               <div>
                 <h3 className="font-serif text-lg mb-1">Price Range</h3>
                 <p className="text-gray-600 text-sm">
-                  ${winery?.tasting_info.price_range[0]} - ${winery?.tasting_info.price_range[1]}
+                  ${winery.tasting_info?.tasting_price?.toFixed(2) ?? "N/A"}
                 </p>
               </div>
             </div>
@@ -242,7 +241,7 @@ const WineryDetail = () => {
               <ul className="space-y-3 text-gray-600">
                 <li className="flex items-center gap-2">
                   <span className="w-2 h-2 bg-wine-primary rounded-full"></span>
-                  Food pairings {winery?.tasting_info.food_pairings_available ? "available" : "not available"}
+                  Food pairings {winery?.tasting_info.food_pairing_options ? "available" : "not available"}
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="w-2 h-2 bg-wine-primary rounded-full"></span>
@@ -254,7 +253,7 @@ const WineryDetail = () => {
         </div>
 
         {/* Tasting Options Section */}
-        <div className="bg-white rounded-lg p-8 shadow-lg">
+        {/* <div className="bg-white rounded-lg p-8 shadow-lg">
           <h2 className="font-serif text-3xl mb-6 text-wine-primary">Tasting Options</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {winery?.tasting_info.tasting_options.map((option) => (
@@ -265,14 +264,14 @@ const WineryDetail = () => {
               </Card>
             ))}
           </div>
-        </div>
+        </div> */}
 
         {/* Book a Tasting Section */}
         <div className="bg-white rounded-lg p-8 shadow-lg">
           <h2 className="font-serif text-3xl mb-6 text-wine-primary">Book a Tasting</h2>
           <div className="space-y-6">
             {/* Tasting Option Selection */}
-            <div>
+            {/* <div>
               <label className="text-sm text-gray-900 font-extrabold">Select Tasting Option</label>
               <select
                 value={selectedTastingOption || ""}
@@ -286,7 +285,7 @@ const WineryDetail = () => {
                   </option>
                 ))}
               </select>
-            </div>
+            </div> */}
 
             {/* Food Pairing Option Selection */}
             <div>
@@ -298,8 +297,8 @@ const WineryDetail = () => {
               >
                 <option value="">No food pairing</option>
                 {winery?.tasting_info.food_pairing_options.map((option) => (
-                  <option key={option.id} value={option.id}>
-                    {option.name} (${option.price})
+                  <option key={option.name} value={option.name} data-price={option.price}>
+                    {option.name} (${option.price.toFixed(2)})
                   </option>
                 ))}
               </select>

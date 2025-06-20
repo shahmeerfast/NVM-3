@@ -1,6 +1,10 @@
 import mongoose from "mongoose";
 
 // Winery Schema
+const ToursSchema = new mongoose.Schema({
+  available: { type: Boolean, default: false },
+  tour_price: { type: Number, default: 0, min: 0 }
+});
 const WinerySchema = new mongoose.Schema({
   name: { type: String, required: true },
   location: {
@@ -17,29 +21,19 @@ const WinerySchema = new mongoose.Schema({
   description: { type: String },
   images: [{ type: String }],
   tasting_info: {
-    price_range: [{ type: Number, min: 0 }],
+    tasting_price: { type: Number, required: true, min: 0 },
     available_times: [{ type: String }],
     wine_types: [{ type: String }],
     number_of_wines_per_tasting: [{ type: Number, min: 0 }],
     special_features: [{ type: String }],
-    food_pairings_available: { type: Boolean, default: false },
-    tasting_options: [
-      {
-        id: { type: String, required: true },
-        name: { type: String, required: true },
-        description: { type: String, required: true },
-        price_per_guest: { type: Number, required: true, min: 0 },
-      },
-    ],
     food_pairing_options: [
       {
-        id: { type: String, required: true },
         name: { type: String, required: true },
-        description: { type: String, required: true },
         price: { type: Number, required: true, min: 0 },
       },
     ],
   },
+  tours: ToursSchema,
   wine_details: [
     {
       name: { type: String, required: true },

@@ -22,23 +22,28 @@ const Filter = ({ wineries, onFilterApply }: FilterProps) => {
     setIsLoading(true);
     let filtered = wineries;
 
+    // Filter by tasting price
     filtered = filtered.filter(
       (winery) =>
-        winery.tasting_info.price_range[1] >= filters.priceRange[0] && winery.tasting_info.price_range[0] <= filters.priceRange[1]
+        winery.tasting_info.tasting_price >= filters.priceRange[0] &&
+        winery.tasting_info.tasting_price <= filters.priceRange[1]
     );
 
+    // Filter by number of wines per tasting
     filtered = filtered.filter(
       (winery) =>
         winery.tasting_info.number_of_wines_per_tasting[0] >= filters.numberOfWines[0] &&
         winery.tasting_info.number_of_wines_per_tasting[1] <= filters.numberOfWines[1]
     );
 
+    // Filter by number of people
     filtered = filtered.filter(
       (winery) =>
         winery.booking_info.number_of_people >= filters.numberOfPeople[0] &&
         winery.booking_info.number_of_people <= filters.numberOfPeople[1]
     );
 
+    // Filter by wine type
     if (Object.values(filters.wineType).some((value) => value)) {
       filtered = filtered.filter((winery) =>
         Object.keys(filters.wineType).some(
@@ -48,15 +53,26 @@ const Filter = ({ wineries, onFilterApply }: FilterProps) => {
         )
       );
     }
+
+    // Filter by AVA
     if (filters.ava.length > 0) filtered = filtered.filter((winery) => filters.ava.includes(winery.ava));
+
+    // Filter by available time
     if (filters.time)
       filtered = filtered.filter((winery) =>
         winery.tasting_info.available_times.some((time) => filters.time.toLowerCase() === time.toLowerCase())
       );
+
+    // Filter by special features
     if (filters.specialFeatures.length > 0) {
       filtered = filtered.filter((winery) =>
         filters.specialFeatures.every((feature) => winery.tasting_info.special_features.includes(feature))
       );
+    }
+
+    // Filter by tour availability
+    if (filters.toursAvailable) {
+      filtered = filtered.filter((winery) => winery.tours.available);
     }
 
     onFilterApply(filtered);
@@ -90,6 +106,7 @@ const Filter = ({ wineries, onFilterApply }: FilterProps) => {
       time: "",
       specialFeatures: [],
       numberOfPeople: [1, 20],
+      toursAvailable: false
     });
     setShowResetModal(false);
   };

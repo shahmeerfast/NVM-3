@@ -9,7 +9,7 @@ interface ItinerarySummaryProps {
 }
 
 export default function ItinerarySummary({ wineries, onConfirm }: ItinerarySummaryProps) {
-  const totalPrice = wineries.reduce((total, winery) => total + winery.tasting_info.price_range[0], 0);
+  const totalPrice = wineries.reduce((total, winery) => total + winery.tasting_info.tasting_price, 0);
   const totalTime = wineries.length * 1.5;
 
   return (

@@ -23,12 +23,12 @@ export default function ItineraryPage() {
   const { user } = useAuthStore();
   const router = useRouter();
 
-  const handleUpdate = (id: string, data: { selectedDate: any; selectedTime: any; guests: any }) => {
+  const handleUpdate = (id: string, data: { selectedDate: any; selectedTime: any }) => {
     const winery = itinerary.find((winery) => winery._id === id);
     if (!winery) return;
     console.log(data);
 
-    winery.bookingDetails = { selectedDateTime: data.selectedTime, guests: data.guests };
+    winery.bookingDetails = { selectedDateTime: data.selectedTime, guests: 1 };
     setItinerary([...itinerary]);
   };
 
@@ -64,7 +64,7 @@ export default function ItineraryPage() {
     if (!user) return setShowAuthModal(true);
     const data = itinerary.map((winery) => ({
       wineryId: winery._id,
-      guests: winery.bookingDetails.guests,
+      guests: `1`,
       dateTime: winery.bookingDetails.selectedDateTime,
     }));
     try {
