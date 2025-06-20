@@ -104,8 +104,8 @@ const handleFoodPairingChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
             💰 Tasting: ${winery.tasting_info?.tasting_price?.toFixed(2) ?? "N/A"}
           </span>
           <span className="flex items-center gap-1">
-            ⏰ {availableTimes.slice(0, 3).map((time) => new Date(time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })).join(", ") || "No times available"}
-            {availableTimes.length > 3 && "..."}
+            ⏰ {winery.tasting_info?.available_times?.slice(0, 3).join(", ") ?? "No times available"}
+            {winery.tasting_info?.available_times?.length > 3 && "..."}
           </span>
         </div>
 
