@@ -179,7 +179,7 @@ export default function WineryListPage() {
                   <h3 className="text-2xl font-semibold border-b pb-1 mb-4">Tasting Info</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <p>
-                      <span className="font-semibold">Price:</span> {selectedWinery.tasting_info.price_range.join(" - ")}
+                      <span className="font-semibold">Price:</span> {selectedWinery.tasting_info.tasting_price}
                     </p>
                     <p>
                       <span className="font-semibold">Available Times:</span>{" "}
@@ -210,9 +210,9 @@ export default function WineryListPage() {
                         <span className="font-semibold">Name:</span> {wine.name}
                       </p>
                       <p>
-                        <span className="font-semibold">Type:</span> {wine.type}
+                        <span className="font-semibold">Cost:</span> {wine.cost}
                       </p>
-                      <p>
+                      {/* <p>
                         <span className="font-semibold">Year:</span> {wine.year}
                       </p>
                       <p>
@@ -220,7 +220,7 @@ export default function WineryListPage() {
                       </p>
                       <p>
                         <span className="font-semibold">Pairing Suggestions:</span> {wine.pairing_suggestions.join(", ")}
-                      </p>
+                      </p> */}
                     </div>
                   ))}
                 </div>

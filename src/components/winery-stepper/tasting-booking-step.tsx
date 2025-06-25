@@ -24,7 +24,7 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
   const [foodPairingOption, setFoodPairingOption] = useState({ id: "", name: "", price: 0 });
   const [newWine, setNewWine] = useState({ id: "", name: "", cost: 0 });
   const [newTimeSlot, setNewTimeSlot] = useState("");
-  const [newTasting, setNewTasting] = useState({ id: "", name: "", price: 0, timeslot: "" });
+  const [newTasting, setNewTasting] = useState({ id: "", name: "", description: "", price: 0, timeslot: "" });
   const [newTour, setNewTour] = useState({ description: "", cost: 0 });
   const [newGuest, setNewGuest] = useState({ description: "", cost: 0 });
 
@@ -144,11 +144,11 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
         ...prev,
         tastins: [
           ...((prev.tastins as Tastings[]) || []),
-          { id: crypto.randomUUID(), name: newTasting.name, price: newTasting.price, time_slots: newTasting.timeslot },
+          { id: crypto.randomUUID(), name: newTasting.name, description: newTasting.description, price: newTasting.price, time_slots: newTasting.timeslot },
         ],
       }));
 
-      setNewTasting({ id: "", name: "", price: 0, timeslot: "" });
+      setNewTasting({ id: "", name: "", description: "", price: 0, timeslot: "" });
     }
   };
 
@@ -466,6 +466,13 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
               value={newTasting.name}
               onChange={(e) => setNewTasting({ ...newTasting, name: e.target.value })}
             />
+             <input
+              type="text"
+              placeholder="Description"
+              className="input input-bordered w-full"
+              value={newTasting.description}
+              onChange={(e) => setNewTasting({ ...newTasting, description: e.target.value })}
+            />
             <input
               type="number"
               placeholder="Price per person"
@@ -579,6 +586,56 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
         </div>
 
         {/* Additional Guests */}
+      </div>
+      {/* Payment Method and Total */}
+      <div className="form-control">
+        <label className="label">Payment Method</label>
+        <div className="flex flex-col gap-2">
+          <label className="flex items-center">
+            <input
+              type="radio"
+              name="paymentMethod"
+              value="pay_winery"
+              checked={formData.booking_info.payment_method === "pay_winery"}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  booking_info: { ...prev.booking_info, payment_method: e.target.value } as BookingInfo,
+                }))
+              }
+              className="radio"
+            />
+            <span className="ml-2">Pay at Winery</span>
+          </label>
+          <label className="flex items-center">
+            <input
+              type="radio"
+              name="paymentMethod"
+              value="pay_stripe"
+              checked={formData.booking_info.payment_method === "pay_stripe"}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  booking_info: { ...prev.booking_info, payment_method: e.target.value } as BookingInfo,
+                }))
+              }
+              className="radio"
+            />
+            <span className="ml-2">Pay in NVW App(stripe)</span>
+          </label>
+        </div>
+      </div>
+
+      {/* Total Amount */}
+      <div className="form-control">
+        <label className="label">
+          Total Amount:{" "}
+          {(formData.tasting_info.tasting_price || 0) +
+            (formData.wine_details?.reduce((sum, wine) => sum + (wine.cost || 0), 0) || 0) +
+            (formData.tours.tour_price || 0) +
+            (formData.food_pairing_options?.reduce((sum, pairing) => sum + (pairing.price || 0), 0) || 0) +
+            (formData.booking_info?.additional_guests?.reduce((sum, guest) => sum + (guest.cost || 0), 0) || 0)}
+        </label>
       </div>
     </div>
   );

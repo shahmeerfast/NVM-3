@@ -1,10 +1,19 @@
 import mongoose from "mongoose";
 
-// Winery Schema
+// Tours Schema
 const ToursSchema = new mongoose.Schema({
   available: { type: Boolean, default: false },
-  tour_price: { type: Number, default: 0, min: 0 }
+  tour_price: { type: Number, default: 0, min: 0 },
+  tour_options: [
+    {
+      description: { type: String, required: true },
+      cost: { type: Number, required: true, min: 0 },
+      tour_id: { type: String }, // Optional, matches interface
+    },
+  ],
 });
+
+// Winery Schema
 const WinerySchema = new mongoose.Schema({
   name: { type: String, required: true },
   location: {
@@ -36,13 +45,19 @@ const WinerySchema = new mongoose.Schema({
   tours: ToursSchema,
   wine_details: [
     {
+      id: { type: String, required: true }, 
       name: { type: String, required: true },
-      type: { type: String },
-      year: { type: Number, min: 0 },
-      tasting_notes: { type: String },
-      pairing_suggestions: [{ type: String }],
+      cost: { type: Number, required: true, min: 0 }
     },
   ],
+  tastings: [
+    {
+      id: { type: String, required: true },
+      name: { type: String, required: true },
+      price: { type: Number, required: true, min: 0 },
+      time_slots: { type: String, required: true }, 
+    },
+  ], // Corrected from tastins to tastings
   ava: { type: String },
   booking_info: {
     booking_enabled: { type: Boolean, default: false },
@@ -52,8 +67,17 @@ const WinerySchema = new mongoose.Schema({
       enabled: { type: Boolean, default: false },
       weekend_multiplier: { type: Number, min: 0 },
     },
-    available_slots: [{ type: Date }],
+    available_slots: [{ type: String }],
     external_booking_link: { type: String },
+    additional_guests: [
+      {
+        description: { type: String, required: true },
+        cost: { type: Number, required: true, min: 0 },
+        guest_id: { type: String },
+      },
+    ],
+    payment_method: { type: String }, 
+    total: { type: Number, min: 0 },
   },
   amenities: {
     virtual_sommelier: { type: Boolean, default: false },

@@ -39,6 +39,7 @@ const initialState: Winery = {
     available_slots: [],
     external_booking_link: "",
     additional_guests: [], 
+    payment_method: "pay_winery"
   },
   amenities: { virtual_sommelier: false, augmented_reality_tours: false, handicap_accessible: false },
   user_reviews: [],

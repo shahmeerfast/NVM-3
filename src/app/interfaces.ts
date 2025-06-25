@@ -70,6 +70,7 @@ export interface BookingInfo {
   available_slots: string[];
   external_booking_link?: string;
   additional_guests: { description: string; cost: number }[];
+  payment_method: string
 }
 
 // Amenities.ts
