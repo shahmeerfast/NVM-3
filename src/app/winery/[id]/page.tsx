@@ -39,7 +39,7 @@ const WineryDetail = () => {
     if (!itinerary.includes(id as any)) {
       const itineraryItem = {
         ...winery,
-        selectedFoodPairingOption: winery.tasting_info.food_pairing_options.find(
+        selectedFoodPairingOption: winery.food_pairing_options.find(
           (opt) => opt.name === selectedFoodPairingOption
         ),
         selectedNumberOfPeople,
@@ -241,7 +241,7 @@ const WineryDetail = () => {
               <ul className="space-y-3 text-gray-600">
                 <li className="flex items-center gap-2">
                   <span className="w-2 h-2 bg-wine-primary rounded-full"></span>
-                  Food pairings {winery?.tasting_info.food_pairing_options ? "available" : "not available"}
+                  Food pairings {winery?.tasting_info.available_times ? "available" : "not available"}
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="w-2 h-2 bg-wine-primary rounded-full"></span>
@@ -296,11 +296,11 @@ const WineryDetail = () => {
                 className="select select-bordered w-full mt-2 text-sm"
               >
                 <option value="">No food pairing</option>
-                {winery?.tasting_info.food_pairing_options.map((option) => (
+                {/* {winery?.food_pairing_options.map((option) => (
                   <option key={option.name} value={option.name} data-price={option.price}>
                     {option.name} (${option.price.toFixed(2)})
                   </option>
-                ))}
+                ))} */}
               </select>
             </div>
 
