@@ -15,17 +15,19 @@ const initialState: Winery = {
   location: { address: "", latitude: 0, longitude: 0, is_mountain_location: false },
   contact_info: { email: "", phone: "", website: "" },
   images: [],
+  food_pairing_options: [],
+  tastins: [],
   tasting_info: {
-    tasting_price: 0, // Changed from price_range to single fixed price
+    tasting_price: 0,
     available_times: [],
     wine_types: [],
     number_of_wines_per_tasting: [1, 2],
     special_features: [],
-    food_pairing_options: [], // Array to store food pairings or platters with name and price
   },
   tours: {
     available: false,
-    tour_price: 0, // Fixed price for tour if available
+    tour_price: 0,
+    tour_options: [],
   },
   wine_details: [],
   ava: "",
@@ -36,10 +38,12 @@ const initialState: Winery = {
     dynamic_pricing: { enabled: false, weekend_multiplier: 0 },
     available_slots: [],
     external_booking_link: "",
+    additional_guests: [], 
   },
   amenities: { virtual_sommelier: false, augmented_reality_tours: false, handicap_accessible: false },
   user_reviews: [],
   transportation: { uber_availability: false, lyft_availability: false, distance_from_user: 0 },
+  booking_slots: [], 
 };
 
 export default function WineryAdminStepperPage() {
@@ -110,7 +114,7 @@ export default function WineryAdminStepperPage() {
         <div className="steps mb-4">
           <div className={`step ${activeStep >= 0 ? "step-primary" : ""}`}>Basic Info</div>
           <div className={`step ${activeStep >= 1 ? "step-primary" : ""}`}>Tasting & Booking</div>
-          <div className={`step ${activeStep >= 2 ? "step-primary" : ""}`}>Wine Details</div>
+          {/* <div className={`step ${activeStep >= 2 ? "step-primary" : ""}`}>Wine Details</div> */}
         </div>
 
         {loading && (
@@ -129,7 +133,7 @@ export default function WineryAdminStepperPage() {
                 Back
               </button>
             )}
-            {activeStep < 2 ? (
+            {activeStep < 1 ? (
               <button type="button" onClick={handleNext} className="btn btn-primary ml-auto">
                 Next
               </button>

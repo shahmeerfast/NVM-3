@@ -1,82 +1,100 @@
-interface Location {
+// Location.ts
+export interface Location {
   address: string;
   latitude: number;
   longitude: number;
   is_mountain_location: boolean;
 }
 
-interface ContactInfo {
+// ContactInfo.ts
+export interface ContactInfo {
   phone: string;
   email: string;
   website: string;
 }
 
-interface FoodPairingOption {
+// FoodPairingOption.ts
+export interface FoodPairingOption {
+  id: string;
   name: string;
   price: number;
 }
 
-interface TastingInfo {
+export interface Tastings {
+  id: string
+  name: string;
+  price: number;
+  time_slots: string;
+}
+// TastingInfo.ts
+export interface TastingInfo {
   tasting_price: number;
   available_times: string[];
   wine_types: string[];
   number_of_wines_per_tasting: [number, number];
   special_features: string[];
-  food_pairing_options: FoodPairingOption[];
 }
 
-interface Tours {
+// Tours.ts
+export interface Tours {
   available: boolean;
   tour_price: number;
+  tour_options: { description: string; cost: number }[];
 }
 
-interface WineDetail {
-  wine_id: string;
+// WineDetail.ts
+export interface WineDetail {
+  id: string;
   name: string;
-  type: string;
-  year: number;
-  tasting_notes: string;
-  pairing_suggestions: string[];
+  cost: number;
 }
 
-interface BookingSlot {
+// BookingSlot.ts
+export interface BookingSlot {
   date: string;
   times: string[];
 }
 
-interface DynamicPricing {
+// DynamicPricing.ts
+export interface DynamicPricing {
   enabled: boolean;
   weekend_multiplier: number;
 }
 
-interface BookingInfo {
+// BookingInfo.ts
+export interface BookingInfo {
   booking_enabled: boolean;
   max_guests_per_slot: number;
   number_of_people: number;
   dynamic_pricing: DynamicPricing;
   available_slots: string[];
   external_booking_link?: string;
+  additional_guests: { description: string; cost: number }[];
 }
 
-interface Amenities {
+// Amenities.ts
+export interface Amenities {
   virtual_sommelier: boolean;
   augmented_reality_tours: boolean;
   handicap_accessible: boolean;
 }
 
-interface UserReview {
+// UserReview.ts
+export interface UserReview {
   review_id: string;
   user_id: string;
   rating: number;
   comment: string;
 }
 
-interface Transportation {
+// Transportation.ts
+export interface Transportation {
   uber_availability: boolean;
   lyft_availability: boolean;
   distance_from_user: number;
 }
 
+// Winery.ts
 export interface Winery {
   _id?: string;
   name: string;
@@ -85,16 +103,17 @@ export interface Winery {
   description: string;
   images: string[];
   tasting_info: TastingInfo;
+  booking_slots: BookingSlot[];
+  food_pairing_options: FoodPairingOption[];
   tours: Tours;
   wine_details: WineDetail[];
+  tastins: Tastings[];
   ava: string;
   booking_info: BookingInfo;
   amenities: Amenities;
   user_reviews: UserReview[];
   transportation: Transportation;
 }
-
-
 
 
 // interface Winery {
