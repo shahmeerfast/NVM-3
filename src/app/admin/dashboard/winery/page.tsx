@@ -3,7 +3,6 @@ import React, { useRef, useState } from "react";
 import { Winery } from "@/app/interfaces";
 import { BasicInfoForm } from "@/components/winery-stepper/basic-info-step";
 import { TastingBookingForm } from "@/components/winery-stepper/tasting-booking-step";
-import { WineDetailsForm } from "@/components/winery-stepper/wine-detail-form-step";
 import { fileUpload } from "@/lib/fileUpload";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
@@ -101,8 +100,6 @@ export default function WineryAdminStepperPage() {
             setAvailableSlotDates={setAvailableSlotDates}
           />
         );
-      case 2:
-        return <WineDetailsForm formData={formData} setFormData={setFormData} />;
       default:
         return null;
     }

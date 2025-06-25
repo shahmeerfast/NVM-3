@@ -83,7 +83,7 @@ const handleFoodPairingChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
 
   useEffect(() => {
     setSelections((prev) => ({ ...prev, foodPairings: [] }));
-  }, [winery.tasting_info?.food_pairing_options]);
+  }, [winery.tasting_info]);
 
   return (
     <div className="card shadow-sm bg-white rounded-xl p-4 md:p-6 flex flex-col md:flex-row gap-4 items-start w-full">
@@ -165,12 +165,12 @@ const handleFoodPairingChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
               className="select select-bordered w-full text-sm h-10"
               onChange={handleFoodPairingChange}
             >
-              {winery.tasting_info?.food_pairing_options?.length > 0 ? (
+              {winery?.food_pairing_options?.length > 0 ? (
                 <>
                   <option value="">
                     Select food pairings
                   </option>
-                  {winery.tasting_info.food_pairing_options.map((option) => (
+                  {winery.food_pairing_options.map((option) => (
                     <option key={option.name} value={option.name} data-price={option.price}>
                       {option.name} (${option.price.toFixed(2)})
                     </option>
