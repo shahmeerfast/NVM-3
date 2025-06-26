@@ -6,7 +6,6 @@ export interface BookingData {
   selectedDate: string;
   selectedTime: string;
   tasting: boolean;
-  tour: boolean;
   foodPairings: { name: string; price: number }[];
 }
 

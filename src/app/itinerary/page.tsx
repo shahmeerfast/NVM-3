@@ -72,7 +72,6 @@ export default function ItineraryPage() {
       wineryId: winery._id,
       dateTime: winery.bookingDetails?.selectedTime,
       tasting: winery.bookingDetails?.tasting && winery.tasting_info?.tasting_price ? winery.tasting_info.tasting_price : null,
-      tour: winery.bookingDetails?.tour && winery.tours?.tour_price ? winery.tours.tour_price : null,
       foodPairings: winery.bookingDetails?.foodPairings || [],
     }));
     try {

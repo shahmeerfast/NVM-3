@@ -22,7 +22,6 @@ export default function WineryBookingCard({ winery, onUpdate, onRemove }: Winery
   const [availableTimes, setAvailableTimes] = useState<string[]>([]);
   const [selections, setSelections] = useState({
     tasting: false,
-    tour: false,
     foodPairings: [] as { name: string; price: number }[],
   });
 
@@ -46,7 +45,6 @@ export default function WineryBookingCard({ winery, onUpdate, onRemove }: Winery
       selectedDate,
       selectedTime,
       tasting: selections.tasting,
-      tour: selections.tour,
       foodPairings: selections.foodPairings,
     });
   }, [selectedDate, selectedTime, selections, winery._id, winery.name, onUpdate]);
@@ -61,7 +59,7 @@ export default function WineryBookingCard({ winery, onUpdate, onRemove }: Winery
     }
   };
 
-  const handleSelectionChange = (key: "tasting" | "tour", value: boolean) => {
+  const handleSelectionChange = (key: "tasting", value: boolean) => {
     setSelections((prev) => ({ ...prev, [key]: value }));
   };
 
@@ -107,23 +105,6 @@ const handleFoodPairingChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
             ⏰ {winery.tasting_info?.available_times?.slice(0, 3).join(", ") ?? "No times available"}
             {winery.tasting_info?.available_times?.length > 3 && "..."}
           </span>
-        </div>
-
-        <div className="mt-4 space-y-2">
-          {winery.tours?.available && (
-            <div className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                id={`tour-${winery._id || winery.name}`}
-                checked={selections.tour}
-                onChange={(e) => handleSelectionChange("tour", e.target.checked)}
-                className="checkbox checkbox-primary"
-              />
-              <label htmlFor={`tour-${winery._id || winery.name}`} className="text-sm">
-                Tour (${winery.tours?.tour_price?.toFixed(2) ?? "N/A"})
-              </label>
-            </div>
-          )}
         </div>
 
         <div className="mt-4 flex flex-wrap md:flex-nowrap gap-4">
