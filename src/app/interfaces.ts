@@ -23,6 +23,7 @@ export interface FoodPairingOption {
 export interface Tastings {
   id: string
   name: string;
+  description: string;
   price: number;
   time_slots: string;
 }
@@ -49,11 +50,6 @@ export interface WineDetail {
   cost: number;
 }
 
-// BookingSlot.ts
-export interface BookingSlot {
-  date: string;
-  times: string[];
-}
 
 // DynamicPricing.ts
 export interface DynamicPricing {
@@ -104,7 +100,6 @@ export interface Winery {
   description: string;
   images: string[];
   tasting_info: TastingInfo;
-  booking_slots: BookingSlot[];
   food_pairing_options: FoodPairingOption[];
   tours: Tours;
   wine_details: WineDetail[];

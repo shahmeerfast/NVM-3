@@ -35,13 +35,13 @@ const WinerySchema = new mongoose.Schema({
     wine_types: [{ type: String }],
     number_of_wines_per_tasting: [{ type: Number, min: 0 }],
     special_features: [{ type: String }],
-    food_pairing_options: [
+  },
+  food_pairing_options: [
       {
         name: { type: String, required: true },
         price: { type: Number, required: true, min: 0 },
       },
-    ],
-  },
+  ],
   tours: ToursSchema,
   wine_details: [
     {

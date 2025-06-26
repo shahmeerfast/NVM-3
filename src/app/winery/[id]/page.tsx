@@ -37,14 +37,7 @@ const WineryDetail = () => {
 
   const addToItinerary = () => {
     if (!itinerary.includes(id as any)) {
-      const itineraryItem = {
-        ...winery,
-        selectedFoodPairingOption: winery.food_pairing_options.find(
-          (opt) => opt.name === selectedFoodPairingOption
-        ),
-        selectedNumberOfPeople,
-      };
-      setItinerary([...(itinerary as any), itineraryItem as any]);
+      setItinerary([...itinerary, winery]);
       toast.success(`${winery?.name} added to your itinerary!`);
     } else {
       toast.error("Winery already in itinerary!");
@@ -200,6 +193,69 @@ const WineryDetail = () => {
           </Card>
         </div>
 
+        {/* Form Data Section */}
+        <div className="bg-white rounded-lg p-8 shadow-lg">
+          <h2 className="font-serif text-3xl mb-6 text-wine-primary">Booking Details</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Wine Section */}
+            <div>
+              <h3 className="font-serif text-xl mb-4">Wine</h3>
+              {winery.wine_details.map((wine, index) => (
+                <div key={wine.id} className="mb-4">
+                  <p><strong>Wine Name:</strong> {wine.name}</p>
+                  <p><strong>Wine Cost:</strong> ${wine.cost}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Tour Options Section */}
+            <div>
+              <h3 className="font-serif text-xl mb-4">Tour Options</h3>
+              {winery.tours.tour_options.map((tour, index) => (
+                <div key={index+1} className="mb-4">
+                  <p><strong>Tour Option #{index + 1}:</strong> {tour.description}</p>
+                  <p><strong>Tour Cost:</strong> ${tour.cost}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Tastings Section */}
+            <div>
+              <h3 className="font-serif text-xl mb-4">Tastings</h3>
+              {winery?.tastins?.map((tasting, index) => (
+                <div key={tasting.id} className="mb-4">
+                  <p><strong>Tasting #{index + 1}:</strong> {tasting.name}</p>
+                  <p><strong>Description:</strong> {tasting.description}</p>
+                  <p><strong>Price per person:</strong> ${tasting.price}</p>
+                  <p><strong>Time slot:</strong> {tasting.time_slots || "N/A"}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Additional Guests Section */}
+            <div>
+              <h3 className="font-serif text-xl mb-4">Additional Guests</h3>
+              {winery.booking_info.additional_guests.map((guest, index) => (
+                <div key={index+1} className="mb-4">
+                  <p><strong>Additional Guest #{index + 1}:</strong> {guest.description}</p>
+                  <p><strong>Guest Cost:</strong> ${guest.cost}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Food Pairings Section */}
+            <div>
+              <h3 className="font-serif text-xl mb-4">Food Pairings</h3>
+              {winery?.food_pairing_options.map((pairing, index) => (
+                <div key={index+1} className="mb-4">
+                  <p><strong>Food Pairing #{index + 1}:</strong> {pairing.name}</p>
+                  <p><strong>Price:</strong> ${pairing.price}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
         {/* Tasting Experience Section */}
         <div className="bg-white rounded-xl p-8 shadow-lg">
           <div className="flex items-center gap-3 mb-8">
@@ -252,41 +308,10 @@ const WineryDetail = () => {
           </div>
         </div>
 
-        {/* Tasting Options Section */}
-        {/* <div className="bg-white rounded-lg p-8 shadow-lg">
-          <h2 className="font-serif text-3xl mb-6 text-wine-primary">Tasting Options</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {winery?.tasting_info.tasting_options.map((option) => (
-              <Card key={option.id} className="p-6 hover:shadow-lg transition-all">
-                <h3 className="font-serif text-xl mb-2">{option.name}</h3>
-                <p className="text-gray-600 mb-4">{option.description}</p>
-                <p className="text-wine-primary font-medium">${option.price_per_guest} per guest</p>
-              </Card>
-            ))}
-          </div>
-        </div> */}
-
         {/* Book a Tasting Section */}
         <div className="bg-white rounded-lg p-8 shadow-lg">
           <h2 className="font-serif text-3xl mb-6 text-wine-primary">Book a Tasting</h2>
           <div className="space-y-6">
-            {/* Tasting Option Selection */}
-            {/* <div>
-              <label className="text-sm text-gray-900 font-extrabold">Select Tasting Option</label>
-              <select
-                value={selectedTastingOption || ""}
-                onChange={(e) => setSelectedTastingOption(e.target.value)}
-                className="select select-bordered w-full mt-2 text-sm"
-              >
-                <option value="">Choose a tasting option</option>
-                {winery?.tasting_info.tasting_options.map((option) => (
-                  <option key={option.id} value={option.id}>
-                    {option.name} (${option.price_per_guest}/guest)
-                  </option>
-                ))}
-              </select>
-            </div> */}
-
             {/* Food Pairing Option Selection */}
             <div>
               <label className="text-sm text-gray-900 font-extrabold">Select Food Pairing (Optional)</label>
@@ -296,11 +321,11 @@ const WineryDetail = () => {
                 className="select select-bordered w-full mt-2 text-sm"
               >
                 <option value="">No food pairing</option>
-                {/* {winery?.food_pairing_options.map((option) => (
+                {winery?.food_pairing_options.map((option) => (
                   <option key={option.name} value={option.name} data-price={option.price}>
                     {option.name} (${option.price.toFixed(2)})
                   </option>
-                ))} */}
+                ))}
               </select>
             </div>
 
@@ -334,7 +359,6 @@ const WineryDetail = () => {
               slots={winery?.booking_info.available_slots}
               maxGuests={winery?.booking_info.max_guests_per_slot}
               weekendMultiplier={winery?.booking_info.dynamic_pricing.weekend_multiplier}
-              
             />
           </div>
         </div>

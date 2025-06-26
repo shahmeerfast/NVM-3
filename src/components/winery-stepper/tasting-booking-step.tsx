@@ -23,7 +23,6 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
 }) => {
   const [foodPairingOption, setFoodPairingOption] = useState({ id: "", name: "", price: 0 });
   const [newWine, setNewWine] = useState({ id: "", name: "", cost: 0 });
-  const [newTimeSlot, setNewTimeSlot] = useState("");
   const [newTasting, setNewTasting] = useState({ id: "", name: "", description: "", price: 0, timeslot: "" });
   const [newTour, setNewTour] = useState({ description: "", cost: 0 });
   const [newGuest, setNewGuest] = useState({ description: "", cost: 0 });
@@ -36,20 +35,6 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
     }));
   };
 
-  const handleTourAvailabilityChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setFormData((prev) => ({
-      ...prev,
-      tours: { ...prev.tours, available: e.target.checked, tour_price: e.target.checked ? prev.tours.tour_price : 0 } as Tours,
-    }));
-  };
-
-  const handleTourPriceChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = parseFloat(e.target.value) || 0;
-    setFormData((prev) => ({
-      ...prev,
-      tours: { ...prev.tours, tour_price: value } as Tours,
-    }));
-  };
 
   const handleSelectChange = (e: ChangeEvent<HTMLSelectElement>, field: "available_times" | "wine_types") => {
     const selected = Array.from(e.target.selectedOptions, (option) => option.value);
@@ -114,30 +99,6 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
       wine_details: (prev.wine_details as WineDetail[]).filter((_, i) => i !== index),
     }));
   };
-
-  const addTimeSlot = () => {
-    if (newTimeSlot) {
-      setFormData((prev) => ({
-        ...prev,
-        booking_info: {
-          ...prev.booking_info,
-          available_slots: [...(prev.booking_info?.available_slots || []), newTimeSlot],
-        } as BookingInfo,
-      }));
-      setNewTimeSlot("");
-    }
-  };
-
-  const removeTimeSlot = (index: number) => {
-    setFormData((prev) => ({
-      ...prev,
-      booking_info: {
-        ...prev.booking_info,
-        available_slots: (prev.booking_info?.available_slots || []).filter((_, i) => i !== index),
-      } as BookingInfo,
-    }));
-  };
-
   const addTasting = () => {
     if (newTasting.name && newTasting.price >= 0 && newTasting.timeslot) {
       setFormData((prev) => ({

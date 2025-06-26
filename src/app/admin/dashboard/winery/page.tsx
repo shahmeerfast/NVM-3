@@ -43,7 +43,6 @@ const initialState: Winery = {
   amenities: { virtual_sommelier: false, augmented_reality_tours: false, handicap_accessible: false },
   user_reviews: [],
   transportation: { uber_availability: false, lyft_availability: false, distance_from_user: 0 },
-  booking_slots: [], 
 };
 
 export default function WineryAdminStepperPage() {
