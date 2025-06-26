@@ -15,7 +15,7 @@ const initialState: Winery = {
   contact_info: { email: "", phone: "", website: "" },
   images: [],
   food_pairing_options: [],
-  tastins: [],
+  tastings: [],
   tasting_info: {
     tasting_price: 0,
     available_times: [],

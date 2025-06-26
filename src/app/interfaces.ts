@@ -103,7 +103,7 @@ export interface Winery {
   food_pairing_options: FoodPairingOption[];
   tours: Tours;
   wine_details: WineDetail[];
-  tastins: Tastings[];
+  tastings: Tastings[];
   ava: string;
   booking_info: BookingInfo;
   amenities: Amenities;

@@ -222,7 +222,7 @@ const WineryDetail = () => {
             {/* Tastings Section */}
             <div>
               <h3 className="font-serif text-xl mb-4">Tastings</h3>
-              {winery?.tastins?.map((tasting, index) => (
+              {winery?.tastings?.map((tasting, index) => (
                 <div key={tasting.id} className="mb-4">
                   <p><strong>Tasting #{index + 1}:</strong> {tasting.name}</p>
                   <p><strong>Description:</strong> {tasting.description}</p>

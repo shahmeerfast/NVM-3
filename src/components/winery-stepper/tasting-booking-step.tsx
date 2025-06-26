@@ -103,8 +103,8 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
     if (newTasting.name && newTasting.price >= 0 && newTasting.timeslot) {
       setFormData((prev) => ({
         ...prev,
-        tastins: [
-          ...((prev.tastins as Tastings[]) || []),
+        tastings: [
+          ...((prev.tastings as Tastings[]) || []),
           { id: crypto.randomUUID(), name: newTasting.name, description: newTasting.description, price: newTasting.price, time_slots: newTasting.timeslot },
         ],
       }));
@@ -114,12 +114,9 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
   };
 
   const removeTasting = (index: number) => {
-    setFormData((prev) => ({
+     setFormData((prev) => ({
       ...prev,
-      tasting_info: {
-        ...prev.tasting_info,
-        food_pairing_options: (prev?.food_pairing_options || []).filter((_, i) => i !== index),
-      } as TastingInfo,
+      tastings: (prev.tastings as Tastings[]).filter((_, i) => i !== index),
     }));
   };
 
@@ -455,7 +452,7 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
             </button>
           </div>
           <div className="mt-2">
-            {formData?.tastins?.map((tasting, index) => (
+            {formData?.tastings?.map((tasting, index) => (
               <div key={index} className="flex justify-between items-center p-2 border-b">
                 <span>
                   {tasting.name}: ${tasting.price}
