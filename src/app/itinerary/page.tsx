@@ -70,99 +70,99 @@ export default function ItineraryPage() {
       );
     });
   };
-  const handleConfirmBooking = async () => {
-    if (!user) return setShowAuthModal(true);
+const handleConfirmBooking = async () => {
+  if (!user) return setShowAuthModal(true);
 
-    const data = itinerary.map((winery) => ({
-      wineryId: winery._id,
-      dateTime: winery.bookingDetails?.selectedTime,
-      tasting: winery.bookingDetails?.tasting && winery.tasting_info?.tasting_price ? winery.tasting_info.tasting_price : null,
-      foodPairings: winery.bookingDetails?.foodPairings || [],
-    }));
+  const data = itinerary.map((winery) => ({
+    wineryId: winery._id,
+    dateTime: winery.bookingDetails?.selectedTime,
+    tasting: winery.bookingDetails?.tasting && winery.tasting_info?.tasting_price ? winery.tasting_info.tasting_price : null,
+    foodPairings: winery.bookingDetails?.foodPairings || [],
+  }));
 
-    try {
-      const requiresStripe = itinerary.some((winery) => winery.booking_info?.payment_method === "pay_stripe");
+  try {
+    const requiresStripe = itinerary.some((winery) => winery.booking_info?.payment_method === "pay_stripe");
 
-      if (requiresStripe) {
-        setLoadingPayment(true);
-        const lineItems = itinerary
-          .filter((winery) => winery.booking_info?.payment_method === "pay_stripe")
-          .map((winery) => {
-            const items: any[] = [];
-            if (winery.bookingDetails?.tasting && winery.tasting_info?.tasting_price) {
-              items.push({
-                price_data: {
-                  currency: "usd",
-                  product_data: {
-                    name: `${winery.name} - Wine Tasting`,
-                  },
-                  unit_amount: Math.round(winery.tasting_info.tasting_price * 100),
+    if (requiresStripe) {
+      setLoadingPayment(true);
+      const lineItems = itinerary
+        .filter((winery) => winery.booking_info?.payment_method === "pay_stripe")
+        .map((winery) => {
+          let totalCost = 0;
+          const items = [];
+
+          // Add tasting price if selected
+          if (winery.tasting_info?.tasting_price) {
+            totalCost += winery.tasting_info.tasting_price;
+          }
+
+          // Add food pairing prices
+          if (winery.bookingDetails?.foodPairings?.length) {
+            totalCost += winery.bookingDetails.foodPairings.reduce((sum, foodItem) => {
+              return foodItem.price ? sum + foodItem.price : sum;
+            }, 0);
+          }
+
+          // Create a single line item if there’s a cost
+          if (totalCost > 0) {
+            items.push({
+              price_data: {
+                currency: "usd",
+                product_data: {
+                  name: `${winery.name} - Booking (Tasting & Food Pairings)`,
                 },
-                quantity: 1,
-              });
-            }
-            if (winery.bookingDetails?.foodPairings?.length) {
-              winery.bookingDetails.foodPairings.forEach((foodItem) => {
-                if (foodItem.name && foodItem.price) {
-                  items.push({
-                    price_data: {
-                      currency: "usd",
-                      product_data: {
-                        name: `${winery.name} - ${foodItem.name}`,
-                      },
-                      unit_amount: Math.round(foodItem.price * 100),
-                    },
-                    quantity: 1,
-                  });
-                }
-              });
-            }
-            return items;
-          })
-          .flat();
+                unit_amount: Math.round(totalCost * 100), // Convert to cents
+              },
+              quantity: 1,
+            });
+          }
 
-        // Validate lineItems
-        if (!lineItems.length) {
-          console.error("No valid line items for Stripe checkout. Itinerary:", itinerary);
-          throw new Error("No items selected for payment. Please add a tasting or food pairing.");
-        }
+          return items;
+        })
+        .flat();
 
-        const response = await axios.post("/api/stripe/create-checkout-session", {
-          line_items: lineItems,
-          success_url: `${window.location.origin}/itinerary?success=true`,
-          cancel_url: `${window.location.origin}/itinerary?cancel=true`,
-          metadata: { itinerary: JSON.stringify(data) },
-          bookData: data,
-        });
-
-        const { sessionId } = response.data;
-        const stripe = await stripePromise;
-        if (stripe) {
-          await stripe.redirectToCheckout({ sessionId });
-        } else {
-          throw new Error("Stripe failed to initialize");
-        }
-      } else {
-        const response = await axios.post("/api/itinerary/book", { data });
-        if (response.status === 201) {
-          setShowRideModal(true);
-        }
+      // Validate lineItems
+      if (!lineItems.length) {
+        console.error("No valid line items for Stripe checkout. Itinerary:", itinerary);
+        throw new Error("No items selected for payment. Please add a tasting or food pairing.");
       }
-    } catch (error: any) {
-      console.error("Booking error:", error);
-      if (error.response?.status === 404) {
-        alert("Payment processing is currently unavailable. Please try again later or contact support.");
-      } else if (error.message.includes("Stripe")) {
-        alert("Failed to initialize payment. Please check your connection and try again.");
-      } else if (error.message.includes("No items selected")) {
-        alert(error.message);
+
+      const response = await axios.post("/api/stripe/create-checkout-session", {
+        line_items: lineItems,
+        success_url: `${window.location.origin}/itinerary?success=true`,
+        cancel_url: `${window.location.origin}/itinerary?cancel=true`,
+        metadata: { itinerary: JSON.stringify(data) },
+        bookData: data,
+      });
+
+      const { sessionId } = response.data;
+      const stripe = await stripePromise;
+      if (stripe) {
+        await stripe.redirectToCheckout({ sessionId });
       } else {
-        alert("Failed to process booking. Please try again later.");
+        throw new Error("Stripe failed to initialize");
       }
-    } finally {
-      setLoadingPayment(false);
+    } else {
+      const response = await axios.post("/api/itinerary/book", { data });
+      if (response.status === 201) {
+        setShowRideModal(true);
+      }
     }
-  };
+  } catch (error: any) {
+    console.error("Booking error:", error);
+    if (error.response?.status === 404) {
+      alert("Payment processing is currently unavailable. Please try again later or contact support.");
+    } else if (error.message.includes("Stripe")) {
+      alert("Failed to initialize payment. Please check your connection and try again.");
+    } else if (error.message.includes("No items selected")) {
+      alert(error.message);
+    } else {
+      alert("Failed to process booking. Please try again later.");
+    }
+  } finally {
+    setLoadingPayment(false);
+  }
+};
 
   const handleRideClick = async (service: "uber" | "lyft") => {
     if (!currentLocation) {
