@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
 
-    const booking = new BookingModel({ userId });
+    const booking = new BookingModel({ userId, payment_method: "pay_winery" });
     booking.wineries = data.map((winery) => ({
       wineryId: winery.wineryId,
       datetime: winery.dateTime,
@@ -90,6 +90,7 @@ export async function GET(req: NextRequest) {
           createdAt: { $first: "$createdAt" },
           updatedAt: { $first: "$updatedAt" },
           wineries: { $push: "$wineries" },
+          payment_method: { $first: "$payment_method" }, // Include payment method in the response
         },
       },
       { $sort: { createdAt: -1 } },

@@ -9,6 +9,7 @@ interface BookingCardProps {
 }
 
 export default function BookingCard({ booking, onBookUber }: BookingCardProps) {
+  console.log("booking", booking);
   return (
     <div className="card bg-base-100 shadow hover:shadow-xl rounded-lg overflow-hidden">
       <div className="p-4 space-y-3">
@@ -18,13 +19,18 @@ export default function BookingCard({ booking, onBookUber }: BookingCardProps) {
             <h2 className="text-sm font-semibold">Booking ID: {booking._id}</h2>
             <p className="text-xs text-gray-500">{new Date(booking.createdAt).toLocaleString()}</p>
           </div>
-          <span
-            className={`badge text-xs ${
-              booking.status === "confirmed" ? "badge-success" : booking.status === "pending" ? "badge-warning" : "badge-error"
-            }`}
-          >
-            {booking.status.toUpperCase()}
-          </span>
+          <div className="flex flex-col items-end">
+            <span
+              className={`badge text-xs ${
+                booking.status === "confirmed" ? "badge-success" : booking.status === "pending" ? "badge-warning" : "badge-error"
+              }`}
+            >
+              {booking.status.toUpperCase()}
+            </span>
+            <p className="text-xs text-gray-500 mt-1">
+              {booking.payment_method === "pay_stripe" ? "User paid through Stripe" : "Pay at winery"}
+            </p>
+          </div>
         </div>
 
         {/* Special Requests */}
