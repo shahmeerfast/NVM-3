@@ -124,7 +124,7 @@ export default function WineryAdminStepperPage() {
 
         <form ref={formRef} onSubmit={(e) => e.preventDefault()} className="space-y-6" id="winery-form">
           {renderStep()}
-          <div className="flex justify-between">
+          <div className="flex justify-between" style={{marginBottom: "40px" }}>
             {activeStep > 0 && (
               <button type="button" onClick={handleBack} className="btn">
                 Back
