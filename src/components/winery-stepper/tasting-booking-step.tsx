@@ -22,7 +22,7 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
   setAvailableSlotDates,
 }) => {
   const [foodPairingOption, setFoodPairingOption] = useState({ id: "", name: "", price: 0 });
-  const [newWine, setNewWine] = useState({ id: "", name: "", cost: 0 });
+  // const [newWine, setNewWine] = useState({ id: "", name: "", cost: 0 });
   const [newTasting, setNewTasting] = useState({ id: "", name: "", description: "", price: 0, timeslot: "" });
   const [newTour, setNewTour] = useState({ description: "", cost: 0 });
   const [newGuest, setNewGuest] = useState({ description: "", cost: 0 });
@@ -80,25 +80,25 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
     }));
   };
 
-  const addWine = () => {
-    if (newWine.name && newWine.cost >= 0) {
-      setFormData((prev) => ({
-        ...prev,
-        wine_details: [
-          ...((prev.wine_details as WineDetail[]) || []),
-          { id: crypto.randomUUID(), name: newWine.name, cost: newWine.cost },
-        ],
-      }));
-      setNewWine({ id: "", name: "", cost: 0 });
-    }
-  };
+  // const addWine = () => {
+  //   if (newWine.name && newWine.cost >= 0) {
+  //     setFormData((prev) => ({
+  //       ...prev,
+  //       wine_details: [
+  //         ...((prev.wine_details as WineDetail[]) || []),
+  //         { id: crypto.randomUUID(), name: newWine.name, cost: newWine.cost },
+  //       ],
+  //     }));
+  //     setNewWine({ id: "", name: "", cost: 0 });
+  //   }
+  // };
 
-  const removeWine = (index: number) => {
-    setFormData((prev) => ({
-      ...prev,
-      wine_details: (prev.wine_details as WineDetail[]).filter((_, i) => i !== index),
-    }));
-  };
+  // const removeWine = (index: number) => {
+  //   setFormData((prev) => ({
+  //     ...prev,
+  //     wine_details: (prev.wine_details as WineDetail[]).filter((_, i) => i !== index),
+  //   }));
+  // };
   const addTasting = () => {
     if (newTasting.name && newTasting.price >= 0 && newTasting.timeslot) {
       setFormData((prev) => ({
@@ -336,7 +336,7 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
       {/* New UI Sections */}
       <div className="grid grid-cols-2 gap-4">
         {/* Wine */}
-        <div className="form-control">
+        {/* <div className="form-control">
           <label className="label">Wine #1</label>
           <div className="space-y-2">
             <input
@@ -371,7 +371,7 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
               </div>
             )) || null}
           </div>
-        </div>
+        </div> */}
 
         {/* Time Slot */}
         <div className="form-control">
