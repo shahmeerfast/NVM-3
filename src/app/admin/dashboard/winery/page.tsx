@@ -7,7 +7,6 @@ import { fileUpload } from "@/lib/fileUpload";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { WineDetailsForm } from "@/components/winery-stepper/wine-detail-form-step";
 const initialState: Winery = {
   name: "",
   description: "",
@@ -99,8 +98,6 @@ export default function WineryAdminStepperPage() {
             setAvailableSlotDates={setAvailableSlotDates}
           />
         );
-     case 2:
-        return <WineDetailsForm formData={formData} setFormData={setFormData} />;
       default:
         return null;
     }
@@ -113,7 +110,6 @@ export default function WineryAdminStepperPage() {
         <div className="steps mb-4">
           <div className={`step ${activeStep >= 0 ? "step-primary" : ""}`}>Basic Info</div>
           <div className={`step ${activeStep >= 1 ? "step-primary" : ""}`}>Tasting & Booking</div>
-          <div className={`step ${activeStep >= 2 ? "step-primary" : ""}`}>Featured Wine</div>
         </div>
 
         {loading && (
@@ -132,7 +128,7 @@ export default function WineryAdminStepperPage() {
                 Back
               </button>
             )}
-            {activeStep < 2 ? (
+            {activeStep < 1 ? (
               <button type="button" onClick={handleNext} className="btn btn-primary ml-auto">
                 Next
               </button>
