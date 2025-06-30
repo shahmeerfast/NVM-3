@@ -47,10 +47,7 @@ export interface Tours {
 export interface WineDetail {
   id: string;
   name: string;
-  type: string;
-  year: number;
-  tasting_notes: string;
-  pairing_suggestions: string[];
+
   cost: number;
 }
 
