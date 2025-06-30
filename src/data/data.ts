@@ -18,8 +18,8 @@ export const regions = [
   "Crystal Springs of Napa Valley",
 ];
 
-export const wineTypes = ["Red", "Rose", "White", "Sparkling", "Dessert"];
+export const wineTypes = ["Red", "Rosé", "White", "Sparkling", "Dessert"];
 
-export const specialFeatures = ["Free Tasting with Bottle Purchase", "In-Person Tour", "Food Pairing Available", "Family-Friendly"];
+export const specialFeatures = ["Tasting Waived with Bottle Purchase", "In-Person Tour", "Food Pairing Available", "Family-Friendly"];
 
 export const timeOptions = ["Morning", "Afternoon", "Evening"];
