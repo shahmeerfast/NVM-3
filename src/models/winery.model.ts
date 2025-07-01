@@ -33,7 +33,7 @@ const WinerySchema = new mongoose.Schema({
     tasting_price: { type: Number, required: true, min: 0 },
     available_times: [{ type: String }],
     wine_types: [{ type: String }],
-    number_of_wines_per_tasting: [{ type: Number, min: 0 }],
+    number_of_wines_per_tasting: { type: Number, min: 1, default: 1 },
     special_features: [{ type: String }],
   },
   food_pairing_options: [
@@ -47,34 +47,26 @@ const WinerySchema = new mongoose.Schema({
     {
       id: { type: String, required: true }, 
       name: { type: String, required: true },
-      cost: { type: Number, required: true, min: 0 }
+      description: { type: String, required: true },
     },
   ],
-  tastings: [
-    {
-      id: { type: String, required: true },
-      name: { type: String, required: true },
-      description: { type: String, required: true },
-      price: { type: Number, required: true, min: 0 },
-      time_slots: { type: String, required: true }, 
-    },
-  ], // Corrected from tastins to tastings
+
   ava: { type: String },
   booking_info: {
     booking_enabled: { type: Boolean, default: false },
     max_guests_per_slot: { type: Number, min: 0 },
-    number_of_people: { type: Number, min: 1, default: 1 },
+    number_of_people: [{ type: Number, min: 0 }],
     dynamic_pricing: {
       enabled: { type: Boolean, default: false },
       weekend_multiplier: { type: Number, min: 0 },
     },
     available_slots: [{ type: String }],
     external_booking_link: { type: String },
-    additional_guests: [
+    other_features: [
       {
         description: { type: String, required: true },
         cost: { type: Number, required: true, min: 0 },
-        guest_id: { type: String },
+        feature_id: { type: String },
       },
     ],
     payment_method: { type: String }, 

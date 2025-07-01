@@ -32,15 +32,15 @@ const Filter = ({ wineries, onFilterApply }: FilterProps) => {
     // Filter by number of wines per tasting
     filtered = filtered.filter(
       (winery) =>
-        winery.tasting_info.number_of_wines_per_tasting[0] >= filters.numberOfWines[0] &&
-        winery.tasting_info.number_of_wines_per_tasting[1] <= filters.numberOfWines[1]
+         winery.tasting_info.number_of_wines_per_tasting >= filters.numberOfWines[0] &&
+        winery.tasting_info.number_of_wines_per_tasting <= filters.numberOfWines[1]
     );
 
     // Filter by number of people
     filtered = filtered.filter(
       (winery) =>
-        winery.booking_info.number_of_people >= filters.numberOfPeople[0] &&
-        winery.booking_info.number_of_people <= filters.numberOfPeople[1]
+        winery.booking_info.number_of_people[0] >= filters.numberOfPeople[0] &&
+        winery.booking_info.number_of_people[1] <= filters.numberOfPeople[1]
     );
 
     // Filter by wine type

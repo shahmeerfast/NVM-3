@@ -20,19 +20,15 @@ export interface FoodPairingOption {
   price: number;
 }
 
-export interface Tastings {
-  id: string
-  name: string;
-  description: string;
-  price: number;
-  time_slots: string;
-}
+
 // TastingInfo.ts
 export interface TastingInfo {
+  tasting_title: string;
+  tasting_description: string;
   tasting_price: number;
   available_times: string[];
   wine_types: string[];
-  number_of_wines_per_tasting: [number, number];
+  number_of_wines_per_tasting:number;
   special_features: string[];
 }
 
@@ -47,8 +43,7 @@ export interface Tours {
 export interface WineDetail {
   id: string;
   name: string;
-
-  cost: number;
+  description: string;
 }
 
 
@@ -62,11 +57,11 @@ export interface DynamicPricing {
 export interface BookingInfo {
   booking_enabled: boolean;
   max_guests_per_slot: number;
-  number_of_people: number;
+  number_of_people: [number, number];
   dynamic_pricing: DynamicPricing;
   available_slots: string[];
   external_booking_link?: string;
-  additional_guests: { description: string; cost: number }[];
+  other_features: { description: string; cost: number }[];
   payment_method: string
 }
 
@@ -104,7 +99,6 @@ export interface Winery {
   food_pairing_options: FoodPairingOption[];
   tours: Tours;
   wine_details: WineDetail[];
-  tastings: Tastings[];
   ava: string;
   booking_info: BookingInfo;
   amenities: Amenities;

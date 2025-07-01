@@ -14,12 +14,13 @@ const initialState: Winery = {
   contact_info: { email: "", phone: "", website: "" },
   images: [],
   food_pairing_options: [],
-  tastings: [],
   tasting_info: {
+    tasting_description: "",
+    tasting_title: "",
     tasting_price: 0,
     available_times: [],
     wine_types: [],
-    number_of_wines_per_tasting: [1, 2],
+    number_of_wines_per_tasting: 1,
     special_features: [],
   },
   tours: {
@@ -32,12 +33,12 @@ const initialState: Winery = {
   booking_info: {
     booking_enabled: false,
     max_guests_per_slot: 0,
-    number_of_people: 1,
+    number_of_people: [1, 2],
     dynamic_pricing: { enabled: false, weekend_multiplier: 0 },
     available_slots: [],
     external_booking_link: "",
-    additional_guests: [], 
-    payment_method: "pay_winery"
+    other_features: [],
+    payment_method: "pay_winery",
   },
   amenities: { virtual_sommelier: false, augmented_reality_tours: false, handicap_accessible: false },
   user_reviews: [],
@@ -122,7 +123,7 @@ export default function WineryAdminStepperPage() {
 
         <form ref={formRef} onSubmit={(e) => e.preventDefault()} className="space-y-6" id="winery-form">
           {renderStep()}
-          <div className="flex justify-between" style={{marginBottom: "40px" }}>
+          <div className="flex justify-between" style={{ marginBottom: "40px" }}>
             {activeStep > 0 && (
               <button type="button" onClick={handleBack} className="btn">
                 Back

@@ -1,6 +1,6 @@
 import { ChangeEvent, useState } from "react";
 import { MultiDateTimePicker } from "../datetime-picker";
-import { Winery, TastingInfo, Tours, WineDetail, BookingInfo, FoodPairingOption, Tastings } from "@/app/interfaces";
+import { Winery, TastingInfo, Tours, WineDetail, BookingInfo, FoodPairingOption } from "@/app/interfaces";
 import { MultipleImageUpload } from "../Multi-image-upload";
 import { regions, timeOptions, wineTypes, specialFeatures } from "@/data/data";
 
@@ -22,10 +22,10 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
   setAvailableSlotDates,
 }) => {
   const [foodPairingOption, setFoodPairingOption] = useState({ id: "", name: "", price: 0 });
-  // const [newWine, setNewWine] = useState({ id: "", name: "", cost: 0 });
+  const [newWine, setNewWine] = useState({ id: "", name: "", description: "" });
   const [newTasting, setNewTasting] = useState({ id: "", name: "", description: "", price: 0, timeslot: "" });
   const [newTour, setNewTour] = useState({ description: "", cost: 0 });
-  const [newGuest, setNewGuest] = useState({ description: "", cost: 0 });
+  const [otherFeature, setOtherFeature] = useState({ description: "", cost: 0 });
 
   const handleTastingPriceChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = parseFloat(e.target.value) || 0;
@@ -34,7 +34,6 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
       tasting_info: { ...prev.tasting_info, tasting_price: value } as TastingInfo,
     }));
   };
-
 
   const handleSelectChange = (e: ChangeEvent<HTMLSelectElement>, field: "available_times" | "wine_types") => {
     const selected = Array.from(e.target.selectedOptions, (option) => option.value);
@@ -49,14 +48,6 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
     setFormData((prev) => ({
       ...prev,
       booking_info: { ...prev.booking_info, available_slots: dates.map((d) => d.toISOString()) } as BookingInfo,
-    }));
-  };
-
-  const handleNumberOfPeopleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = parseInt(e.target.value) || 1;
-    setFormData((prev) => ({
-      ...prev,
-      booking_info: { ...prev.booking_info, number_of_people: value } as BookingInfo,
     }));
   };
 
@@ -80,43 +71,23 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
     }));
   };
 
-  // const addWine = () => {
-  //   if (newWine.name && newWine.cost >= 0) {
-  //     setFormData((prev) => ({
-  //       ...prev,
-  //       wine_details: [
-  //         ...((prev.wine_details as WineDetail[]) || []),
-  //         { id: crypto.randomUUID(), name: newWine.name, cost: newWine.cost },
-  //       ],
-  //     }));
-  //     setNewWine({ id: "", name: "", cost: 0 });
-  //   }
-  // };
-
-  // const removeWine = (index: number) => {
-  //   setFormData((prev) => ({
-  //     ...prev,
-  //     wine_details: (prev.wine_details as WineDetail[]).filter((_, i) => i !== index),
-  //   }));
-  // };
-  const addTasting = () => {
-    if (newTasting.name && newTasting.price >= 0 && newTasting.timeslot) {
+  const addWine = () => {
+    if (newWine.name && newWine.description) {
       setFormData((prev) => ({
         ...prev,
-        tastings: [
-          ...((prev.tastings as Tastings[]) || []),
-          { id: crypto.randomUUID(), name: newTasting.name, description: newTasting.description, price: newTasting.price, time_slots: newTasting.timeslot },
+        wine_details: [
+          ...((prev.wine_details as WineDetail[]) || []),
+          { id: crypto.randomUUID(), name: newWine.name, description: newWine.description },
         ],
       }));
-
-      setNewTasting({ id: "", name: "", description: "", price: 0, timeslot: "" });
+      setNewWine({ id: "", name: "", description: "" });
     }
   };
 
-  const removeTasting = (index: number) => {
-     setFormData((prev) => ({
+  const removeWine = (index: number) => {
+    setFormData((prev) => ({
       ...prev,
-      tastings: (prev.tastings as Tastings[]).filter((_, i) => i !== index),
+      wine_details: (prev.wine_details as WineDetail[]).filter((_, i) => i !== index),
     }));
   };
 
@@ -146,28 +117,28 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
     }));
   };
 
-  const addGuest = () => {
-    if (newGuest.description && newGuest.cost >= 0) {
+  const addOtherFeature = () => {
+    if (otherFeature.description && otherFeature.cost >= 0) {
       setFormData((prev) => ({
         ...prev,
         booking_info: {
           ...prev.booking_info,
-          additional_guests: [
-            ...(prev.booking_info?.additional_guests || []),
-            { description: newGuest.description, cost: newGuest.cost, guest_id: crypto.randomUUID() },
+          other_features: [
+            ...(prev.booking_info?.other_features || []),
+            { description: otherFeature.description, cost: otherFeature.cost, feature_id: crypto.randomUUID() },
           ],
         } as BookingInfo,
       }));
-      setNewGuest({ description: "", cost: 0 });
+      setOtherFeature({ description: "", cost: 0 });
     }
   };
 
-  const removeGuest = (index: number) => {
+  const removeFeature = (index: number) => {
     setFormData((prev) => ({
       ...prev,
       booking_info: {
         ...prev.booking_info,
-        additional_guests: (prev.booking_info?.additional_guests || []).filter((_, i) => i !== index),
+        other_features: (prev.booking_info?.other_features || []).filter((_, i) => i !== index),
       } as BookingInfo,
     }));
   };
@@ -178,20 +149,74 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
       booking_info: { ...prev.booking_info, external_booking_link: e.target.value } as BookingInfo,
     }));
   };
+  const handleNumberOfwineChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(e.target.value) || 1;
+    setFormData((prev) => ({
+      ...prev,
+      tasting_info: { ...prev.tasting_info, number_of_wines_per_tasting: value } as TastingInfo,
+    }));
+  };
 
+  const handleTastingTitleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setFormData((prev) => ({
+      ...prev,
+      tasting_info: { ...prev.tasting_info, tasting_title: e.target.value } as TastingInfo,
+    }));
+  };
+  const handleTastingDescriptionChange = (e: any) => {
+    setFormData((prev) => ({
+      ...prev,
+      tasting_info: { ...prev.tasting_info, tasting_description: e.target.value } as TastingInfo,
+    }));
+  };
   return (
     <div className="space-y-4">
-      {/* Number of People */}
-      <div className="form-control">
+      <div className="grid grid-cols-2 gap-4">
         <label className="label">Number of People</label>
-        <input
-          type="number"
-          placeholder="Enter number of people"
-          className="input input-bordered"
-          value={formData.booking_info.number_of_people || 1} // Default to 1 if undefined
-          onChange={handleNumberOfPeopleChange}
-          min={1}
-        />
+        <div className="form-control">
+          <label className="label">Tasting Title</label>
+          <input
+            type="text"
+            placeholder="Enter tasting title"
+            className="input input-bordered"
+            value={formData.tasting_info.tasting_title || ""}
+            onChange={handleTastingTitleChange}
+          />
+        </div>
+        <div className="form-control">
+          <label className="label">Tasting Description</label>
+          <textarea
+            name="description"
+            placeholder="Description"
+            className="textarea textarea-bordered"
+            value={formData.tasting_info.tasting_description || ""}
+            onChange={handleTastingDescriptionChange}
+          />
+        </div>
+        <div className="form-control">
+          <input
+            type="number"
+            placeholder="Enter min number"
+            className="input input-bordered"
+            value={formData.booking_info.number_of_people[0] || ""}
+            onChange={(e) => {
+              formData.booking_info.number_of_people[0] = +e.target.value;
+              setFormData({ ...formData });
+            }}
+          />
+        </div>
+        <div className="form-control">
+          <input
+            type="number"
+            placeholder="Enter max number"
+            className="input input-bordered"
+            value={formData.booking_info.number_of_people[1] || ""}
+            onChange={(e) => {
+              formData.booking_info.number_of_people[1] = +e.target.value;
+              setFormData({ ...formData });
+            }}
+          />
+        </div>
       </div>
 
       {/* Wine Tasting Price */}
@@ -260,53 +285,39 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
             type="number"
             placeholder="Enter min number"
             className="input input-bordered"
-            value={formData.tasting_info.number_of_wines_per_tasting[0] || ""}
-            onChange={(e) => {
-              formData.tasting_info.number_of_wines_per_tasting[0] = +e.target.value;
-              setFormData({ ...formData });
-            }}
+            value={formData.tasting_info.number_of_wines_per_tasting || ""}
+            onChange={handleNumberOfwineChange}
           />
         </div>
-        <div className="form-control">
-          <input
-            type="number"
-            placeholder="Enter max number"
-            className="input input-bordered"
-            value={formData.tasting_info.number_of_wines_per_tasting[1] || ""}
-            onChange={(e) => {
-              formData.tasting_info.number_of_wines_per_tasting[1] = +e.target.value;
-              setFormData({ ...formData });
-            }}
-          />
-        </div>
-      </div>
-      <div className="form-control">
-        <label className="label">Special Features</label>
-        <select
-          className="select select-bordered w-full"
-          value={formData.tasting_info.special_features[0] || ""}
-          onChange={(e) => {
-            const selectedValue = e.target.value;
-            setFormData((prev) => ({
-              ...prev,
-              tasting_info: {
-                ...prev.tasting_info,
-                special_features: selectedValue ? [selectedValue] : [],
-              } as TastingInfo,
-            }));
-          }}
-        >
-          <option value="">Select Special Feature</option>
-          {specialFeatures.map((feature) => (
-            <option key={feature} value={feature}>
-              {feature}
-            </option>
-          ))}
-        </select>
       </div>
 
       {/* AVA & Booking */}
       <div className="grid grid-cols-2 gap-4">
+        <div className="form-control">
+          <label className="label">Special Features</label>
+          <select
+            className="select select-bordered w-full"
+            value={formData.tasting_info.special_features[0] || ""}
+            onChange={(e) => {
+              const selectedValue = e.target.value;
+              setFormData((prev) => ({
+                ...prev,
+                tasting_info: {
+                  ...prev.tasting_info,
+                  special_features: selectedValue ? [selectedValue] : [],
+                } as TastingInfo,
+              }));
+            }}
+          >
+            <option value="">Select Special Feature</option>
+            {specialFeatures.map((feature) => (
+              <option key={feature} value={feature}>
+                {feature}
+              </option>
+            ))}
+          </select>
+        </div>
+
         <div className="form-control">
           <label className="label">Select AVA</label>
           <select
@@ -336,7 +347,7 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
       {/* New UI Sections */}
       <div className="grid grid-cols-2 gap-4">
         {/* Wine */}
-        {/* <div className="form-control">
+        <div className="form-control">
           <label className="label">Wine #1</label>
           <div className="space-y-2">
             <input
@@ -347,13 +358,11 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
               onChange={(e) => setNewWine({ ...newWine, name: e.target.value })}
             />
             <input
-              type="number"
-              placeholder="Wine Cost (e.g., 20)"
+              type="text"
+              placeholder="Wine description"
               className="input input-bordered w-full"
-              value={newWine.cost || ""}
-              onChange={(e) => setNewWine({ ...newWine, cost: parseFloat(e.target.value) || 0 })}
-              min={0}
-              step="0.01"
+              value={newWine.description || ""}
+              onChange={(e) => setNewWine({ ...newWine, description: e.target.value })}
             />
             <button type="button" className="btn btn-primary" onClick={addWine}>
               Add Wine
@@ -362,20 +371,18 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
           <div className="mt-2">
             {formData.wine_details?.map((wine, index) => (
               <div key={wine.id} className="flex justify-between items-center p-2 border-b">
-                <span>
-                  {wine.name}: ${wine.cost}
-                </span>
+                <span>{wine.name}</span>
                 <button type="button" className="btn btn-xs btn-error" onClick={() => removeWine(index)}>
                   Remove
                 </button>
               </div>
             )) || null}
           </div>
-        </div> */}
+        </div>
 
         {/* Time Slot */}
         <div className="form-control">
-          <label className="label">Tour Options</label>
+          <label className="label">Tour (Optional)</label>
           <div className="space-y-2">
             <input
               type="text"
@@ -412,8 +419,7 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        {/* Tastings */}
+      {/* <div className="grid grid-cols-2 gap-4">
         <div className="form-control">
           <label className="label">Tastings</label>
           <div className="space-y-2">
@@ -465,44 +471,8 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
           </div>
         </div>
 
-        {/* Tour Options */}
-        <div className="form-control">
-          <label className="label">Additional Guests</label>
-          <div className="space-y-2">
-            <input
-              type="text"
-              placeholder="Additional Guest #1"
-              className="input input-bordered w-full"
-              value={newGuest.description}
-              onChange={(e) => setNewGuest({ ...newGuest, description: e.target.value })}
-            />
-            <input
-              type="number"
-              placeholder="Guest Cost"
-              className="input input-bordered w-full"
-              value={newGuest.cost || ""}
-              onChange={(e) => setNewGuest({ ...newGuest, cost: parseFloat(e.target.value) || 0 })}
-              min={0}
-              step="0.01"
-            />
-            <button type="button" className="btn btn-primary" onClick={addGuest}>
-              Add Guest
-            </button>
-          </div>
-          <div className="mt-2">
-            {formData.booking_info?.additional_guests?.map((guest, index) => (
-              <div key={index} className="flex justify-between items-center p-2 border-b">
-                <span>
-                  {guest.description}: ${guest.cost}
-                </span>
-                <button type="button" className="btn btn-xs btn-error" onClick={() => removeGuest(index)}>
-                  Remove
-                </button>
-              </div>
-            )) || null}
-          </div>
-        </div>
-      </div>
+ 
+      </div> */}
 
       <div className="grid grid-cols-2 gap-4">
         {/* Food Pairings */}
@@ -542,7 +512,42 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
             )) || null}
           </div>
         </div>
-
+        <div className="form-control">
+          <label className="label">Other Features </label>
+          <div className="space-y-2">
+            <input
+              type="text"
+              placeholder="Other Feature #1"
+              className="input input-bordered w-full"
+              value={otherFeature.description}
+              onChange={(e) => setOtherFeature({ ...otherFeature, description: e.target.value })}
+            />
+            <input
+              type="number"
+              placeholder="Feature Cost"
+              className="input input-bordered w-full"
+              value={otherFeature.cost || ""}
+              onChange={(e) => setOtherFeature({ ...otherFeature, cost: parseFloat(e.target.value) || 0 })}
+              min={0}
+              step="0.01"
+            />
+            <button type="button" className="btn btn-primary" onClick={addOtherFeature}>
+              Add Feature
+            </button>
+          </div>
+          <div className="mt-2">
+            {formData.booking_info?.other_features?.map((feature, index) => (
+              <div key={index} className="flex justify-between items-center p-2 border-b">
+                <span>
+                  {feature.description}: ${feature.cost}
+                </span>
+                <button type="button" className="btn btn-xs btn-error" onClick={() => removeFeature(index)}>
+                  Remove
+                </button>
+              </div>
+            )) || null}
+          </div>
+        </div>
         {/* Additional Guests */}
       </div>
       {/* Payment Method and Total */}
@@ -589,10 +594,9 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
         <label className="label">
           Total Amount:{" "}
           {(formData.tasting_info.tasting_price || 0) +
-            (formData.wine_details?.reduce((sum, wine) => sum + (wine.cost || 0), 0) || 0) +
             (formData.tours.tour_price || 0) +
             (formData.food_pairing_options?.reduce((sum, pairing) => sum + (pairing.price || 0), 0) || 0) +
-            (formData.booking_info?.additional_guests?.reduce((sum, guest) => sum + (guest.cost || 0), 0) || 0)}
+            (formData.booking_info?.other_features?.reduce((sum, guest) => sum + (guest.cost || 0), 0) || 0)}
         </label>
       </div>
     </div>

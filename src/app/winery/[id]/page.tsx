@@ -96,22 +96,13 @@ const WineryDetail = () => {
     <div className="min-h-screen bg-wine-background md:top-20 top-16 relative">
       {/* Hero Section */}
       <div className="relative h-[80vh] overflow-hidden">
-        <img
-          src={winery.images[currentImageIndex]}
-          alt={winery.name}
-          className="w-full h-full object-cover"
-        />
+        <img src={winery.images[currentImageIndex]} alt={winery.name} className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/50 flex items-center justify-center">
           <div className="text-center text-white max-w-4xl px-4">
             <h1 className="font-serif text-6xl mb-6 leading-tight">{winery.name}</h1>
-            <p className="text-xl max-w-2xl mx-auto font-light leading-relaxed">
-              {winery.description}
-            </p>
+            <p className="text-xl max-w-2xl mx-auto font-light leading-relaxed">{winery.description}</p>
             <div className="mt-8">
-              <Button
-                className="bg-wine-primary hover:bg-wine-primary/90 text-white px-8 py-6 text-lg"
-                onClick={addToItinerary}
-              >
+              <Button className="bg-wine-primary hover:bg-wine-primary/90 text-white px-8 py-6 text-lg" onClick={addToItinerary}>
                 Add to Itinerary
               </Button>
             </div>
@@ -148,9 +139,7 @@ const WineryDetail = () => {
               </div>
               <div>
                 <h3 className="font-serif text-lg mb-1">Wine Types</h3>
-                <p className="text-gray-600 text-sm capitalize">
-                  {winery?.tasting_info.wine_types.join(", ")}
-                </p>
+                <p className="text-gray-600 text-sm capitalize">{winery?.tasting_info.wine_types.join(", ")}</p>
               </div>
             </div>
           </Card>
@@ -161,9 +150,7 @@ const WineryDetail = () => {
               </div>
               <div>
                 <h3 className="font-serif text-lg mb-1">Times</h3>
-                <p className="text-gray-600 text-sm capitalize">
-                  {winery?.tasting_info.available_times.join(", ")}
-                </p>
+                <p className="text-gray-600 text-sm capitalize">{winery?.tasting_info.available_times.join(", ")}</p>
               </div>
             </div>
           </Card>
@@ -174,9 +161,7 @@ const WineryDetail = () => {
               </div>
               <div>
                 <h3 className="font-serif text-lg mb-1">Price</h3>
-                <p className="text-gray-600 text-sm">
-                  ${winery.tasting_info?.tasting_price?.toFixed(2) ?? "N/A"}
-                </p>
+                <p className="text-gray-600 text-sm">${winery.tasting_info?.tasting_price?.toFixed(2) ?? "N/A"}</p>
               </div>
             </div>
           </Card>
@@ -202,8 +187,12 @@ const WineryDetail = () => {
               <h3 className="font-serif text-xl mb-4">Wine</h3>
               {winery.wine_details.map((wine, index) => (
                 <div key={wine.id} className="mb-4">
-                  <p><strong>Wine Name:</strong> {wine.name}</p>
-                  <p><strong>Wine Cost:</strong> ${wine.cost}</p>
+                  <p>
+                    <strong>Wine Name:</strong> {wine.name}
+                  </p>
+                  <p>
+                    <strong>Wine Description:</strong> {wine.description}
+                  </p>
                 </div>
               ))}
             </div>
@@ -212,15 +201,19 @@ const WineryDetail = () => {
             <div>
               <h3 className="font-serif text-xl mb-4">Tour Options</h3>
               {winery.tours.tour_options.map((tour, index) => (
-                <div key={index+1} className="mb-4">
-                  <p><strong>Tour Option #{index + 1}:</strong> {tour.description}</p>
-                  <p><strong>Tour Cost:</strong> ${tour.cost}</p>
+                <div key={index + 1} className="mb-4">
+                  <p>
+                    <strong>Tour Option #{index + 1}:</strong> {tour.description}
+                  </p>
+                  <p>
+                    <strong>Tour Cost:</strong> ${tour.cost}
+                  </p>
                 </div>
               ))}
             </div>
 
             {/* Tastings Section */}
-            <div>
+            {/* <div>
               <h3 className="font-serif text-xl mb-4">Tastings</h3>
               {winery?.tastings?.map((tasting, index) => (
                 <div key={tasting.id} className="mb-4">
@@ -230,15 +223,19 @@ const WineryDetail = () => {
                   <p><strong>Time slot:</strong> {tasting.time_slots || "N/A"}</p>
                 </div>
               ))}
-            </div>
+            </div> */}
 
             {/* Additional Guests Section */}
             <div>
-              <h3 className="font-serif text-xl mb-4">Additional Guests</h3>
-              {winery.booking_info.additional_guests.map((guest, index) => (
-                <div key={index+1} className="mb-4">
-                  <p><strong>Additional Guest #{index + 1}:</strong> {guest.description}</p>
-                  <p><strong>Guest Cost:</strong> ${guest.cost}</p>
+              <h3 className="font-serif text-xl mb-4">Other Features</h3>
+              {winery.booking_info.other_features.map((feature, index) => (
+                <div key={index + 1} className="mb-4">
+                  <p>
+                    <strong>Feature #{index + 1}:</strong> {feature.description}
+                  </p>
+                  <p>
+                    <strong>Feature Cost:</strong> ${feature.cost}
+                  </p>
                 </div>
               ))}
             </div>
@@ -247,9 +244,13 @@ const WineryDetail = () => {
             <div>
               <h3 className="font-serif text-xl mb-4">Food Pairings</h3>
               {winery?.food_pairing_options.map((pairing, index) => (
-                <div key={index+1} className="mb-4">
-                  <p><strong>Food Pairing #{index + 1}:</strong> {pairing.name}</p>
-                  <p><strong>Price:</strong> ${pairing.price}</p>
+                <div key={index + 1} className="mb-4">
+                  <p>
+                    <strong>Food Pairing #{index + 1}:</strong> {pairing.name}
+                  </p>
+                  <p>
+                    <strong>Price:</strong> ${pairing.price}
+                  </p>
                 </div>
               ))}
             </div>
@@ -268,10 +269,7 @@ const WineryDetail = () => {
               <div className="space-y-4">
                 <p className="flex items-center gap-2">
                   <FaWineGlass className="text-wine-primary" />
-                  <span>
-                    {winery?.tasting_info.number_of_wines_per_tasting[0]} -{" "}
-                    {winery?.tasting_info.number_of_wines_per_tasting[1]} wines per tasting
-                  </span>
+                  <span>{winery?.tasting_info.number_of_wines_per_tasting} wines per tasting</span>
                 </p>
                 <p className="flex items-center gap-2">
                   <FaUsers className="text-wine-primary" />
