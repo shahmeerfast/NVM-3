@@ -3,7 +3,7 @@ import { MultiDateTimePicker } from "../datetime-picker";
 import { Winery, TastingInfo, Tours, WineDetail, BookingInfo, FoodPairingOption } from "@/app/interfaces";
 import { MultipleImageUpload } from "../Multi-image-upload";
 import { regions, timeOptions, wineTypes, specialFeatures } from "@/data/data";
-
+import Select from "react-select";
 type TastingBookingFormProps = {
   formData: Winery;
   setFormData: React.Dispatch<React.SetStateAction<Winery>>;
@@ -171,29 +171,31 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
   };
   return (
     <div className="space-y-4">
+      <div className="form-control">
+        <label className="label">Tasting Title</label>
+        <input
+          type="text"
+          placeholder="Enter tasting title"
+          className="input input-bordered"
+          value={formData.tasting_info.tasting_title || ""}
+          onChange={handleTastingTitleChange}
+        />
+      </div>
+
+      <div className="form-control">
+        <label className="label">Tasting Description</label>
+        <textarea
+          name="description"
+          placeholder="Description"
+          className="textarea textarea-bordered"
+          value={formData.tasting_info.tasting_description || ""}
+          onChange={handleTastingDescriptionChange}
+        />
+      </div>
       <div className="grid grid-cols-2 gap-4">
-        <label className="label">Number of People</label>
         <div className="form-control">
-          <label className="label">Tasting Title</label>
-          <input
-            type="text"
-            placeholder="Enter tasting title"
-            className="input input-bordered"
-            value={formData.tasting_info.tasting_title || ""}
-            onChange={handleTastingTitleChange}
-          />
-        </div>
-        <div className="form-control">
-          <label className="label">Tasting Description</label>
-          <textarea
-            name="description"
-            placeholder="Description"
-            className="textarea textarea-bordered"
-            value={formData.tasting_info.tasting_description || ""}
-            onChange={handleTastingDescriptionChange}
-          />
-        </div>
-        <div className="form-control">
+          <label className="label">Number of People Min</label>
+
           <input
             type="number"
             placeholder="Enter min number"
@@ -206,6 +208,8 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
           />
         </div>
         <div className="form-control">
+          <label className="label">Number of People Max</label>
+
           <input
             type="number"
             placeholder="Enter max number"
@@ -249,33 +253,28 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
       <div className="grid grid-cols-2 gap-4">
         <div className="form-control">
           <label className="label">Available Times</label>
-          <select
-            multiple
-            className="select select-bordered"
-            value={formData.tasting_info.available_times || []} // Default to empty array if undefined
-            onChange={(e) => handleSelectChange(e, "available_times")}
-          >
-            {timeOptions.map((time) => (
-              <option key={time} value={time}>
-                {time}
-              </option>
-            ))}
-          </select>
+          <Select
+            isMulti
+            options={timeOptions.map((time) => ({ value: time, label: time }))}
+            value={formData.tasting_info.available_times?.map((time) => ({ value: time, label: time }))}
+            onChange={(selected) =>
+              handleSelectChange(
+                { target: { selectedOptions: selected.map((s) => ({ value: s.value })) } } as any,
+                "available_times"
+              )
+            }
+          />
         </div>
         <div className="form-control">
           <label className="label">Wine Types</label>
-          <select
-            multiple
-            className="select select-bordered"
-            value={formData.tasting_info.wine_types || []} // Default to empty array if undefined
-            onChange={(e) => handleSelectChange(e, "wine_types")}
-          >
-            {wineTypes.map((wt) => (
-              <option key={wt} value={wt}>
-                {wt}
-              </option>
-            ))}
-          </select>
+          <Select
+            isMulti
+            options={wineTypes.map((wt) => ({ value: wt, label: wt }))}
+            value={formData.tasting_info.wine_types?.map((wt) => ({ value: wt, label: wt }))}
+            onChange={(selected) =>
+              handleSelectChange({ target: { selectedOptions: selected.map((s) => ({ value: s.value })) } } as any, "wine_types")
+            }
+          />
         </div>
       </div>
       <label className="label">Number of Wines Per Tasting</label>

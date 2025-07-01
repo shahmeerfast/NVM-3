@@ -210,7 +210,7 @@ export default function WineryListPage() {
                         <span className="font-semibold">Name:</span> {wine.name}
                       </p>
                       <p>
-                        <span className="font-semibold">Cost:</span> {wine.cost}
+                        <span className="font-semibold">Description:</span> {wine.description}
                       </p>
                       {/* <p>
                         <span className="font-semibold">Year:</span> {wine.year}
