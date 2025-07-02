@@ -4,6 +4,7 @@ import { Winery, TastingInfo, Tours, WineDetail, BookingInfo, FoodPairingOption 
 import { MultipleImageUpload } from "../Multi-image-upload";
 import { regions, timeOptions, wineTypes, specialFeatures } from "@/data/data";
 import Select from "react-select";
+import { FaMapMarkerAlt } from "react-icons/fa";
 type TastingBookingFormProps = {
   formData: Winery;
   setFormData: React.Dispatch<React.SetStateAction<Winery>>;
@@ -318,7 +319,10 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
         </div>
 
         <div className="form-control">
-          <label className="label">Select AVA</label>
+          <label className="label flex items-center gap-1">
+            Select AVA 
+            <FaMapMarkerAlt style={{ color: "#5A0C2C" }} />
+          </label>
           <select
             className="select select-bordered"
             value={formData.ava || ""}

@@ -2,6 +2,7 @@ import { Range } from "react-range";
 import Select from "react-select";
 import { wineTypes, regions, timeOptions, specialFeatures } from "@/data/data";
 import React from "react";
+import { FaMapMarkerAlt } from "react-icons/fa";
 
 type Filters = {
   priceRange: [number, number];
@@ -136,7 +137,10 @@ export const FilterBlock = ({
 
       {/* AVA Filter */}
       <div className="mt-4">
-        <label className="text-sm font-extrabold text-gray-900">American Viticultural Area (AVA)</label>
+        <label className="text-sm font-extrabold text-gray-900 flex items-center gap-1">
+          American Viticultural Area (AVA)
+         <FaMapMarkerAlt style={{ color: "#5A0C2C" }} />
+        </label>
         <Select
           menuPlacement="top"
           isMulti
