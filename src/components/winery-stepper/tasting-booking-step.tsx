@@ -480,11 +480,11 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
       <div className="grid grid-cols-2 gap-4">
         {/* Food Pairings */}
         <div className="form-control">
-          <label className="label">Food Pairings</label>
+          <label className="label">Food Available</label>
           <div className="space-y-2">
             <input
               type="text"
-              placeholder="Food Pairing #1"
+              placeholder="Food Available #1"
               className="input input-bordered w-full"
               value={foodPairingOption.name}
               onChange={(e) => setFoodPairingOption({ ...foodPairingOption, name: e.target.value })}
@@ -499,7 +499,7 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
               step="0.01"
             />
             <button type="button" className="btn btn-primary" onClick={addFoodPairingOption}>
-              Add Food Pairing
+              Add Food Available 
             </button>
           </div>
           <div className="mt-2">
