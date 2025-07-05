@@ -193,7 +193,7 @@ export default function WineryListPage() {
                       {selectedWinery.tasting_info.special_features.join(", ")}
                     </p>
                     <p>
-                      <span className="font-semibold">Food Pairings:</span>{" "}
+                      <span className="font-semibold">Food Available:</span>{" "}
                       {selectedWinery.tasting_info.food_pairings_available ? "Yes" : "No"}
                     </p>
                   </div>

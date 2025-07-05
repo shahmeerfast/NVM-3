@@ -141,7 +141,7 @@ const handleFoodPairingChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
           </div>
 
           <div className="w-full md:w-1/3">
-            <label className="block text-xs font-medium text-gray-600">Food Pairings</label>
+            <label className="block text-xs font-medium text-gray-600">Food Available</label>
             <select
               className="select select-bordered w-full text-sm h-10"
               onChange={handleFoodPairingChange}
@@ -149,7 +149,7 @@ const handleFoodPairingChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
               {winery?.food_pairing_options?.length > 0 ? (
                 <>
                   <option value="">
-                    Select food pairings
+                    Select food available
                   </option>
                   {winery.food_pairing_options.map((option) => (
                     <option key={option.name} value={option.name} data-price={option.price}>

@@ -295,7 +295,7 @@ const WineryDetail = () => {
               <ul className="space-y-3 text-gray-600">
                 <li className="flex items-center gap-2">
                   <span className="w-2 h-2 bg-wine-primary rounded-full"></span>
-                  Food pairings {winery?.tasting_info.available_times ? "available" : "not available"}
+                  Food  {winery?.tasting_info.available_times ? "available" : "not available"}
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="w-2 h-2 bg-wine-primary rounded-full"></span>

@@ -92,30 +92,17 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
     }));
   };
 
-  const addTour = () => {
+  const submitTour = () => {
     if (newTour.description && newTour.cost >= 0) {
       setFormData((prev) => ({
         ...prev,
         tours: {
           ...prev.tours,
-          tour_options: [
-            ...(prev.tours?.tour_options || []),
-            { description: newTour.description, cost: newTour.cost, tour_id: crypto.randomUUID() },
-          ],
+          tour_options: [{ description: newTour.description, cost: newTour.cost }],
         } as Tours,
       }));
       setNewTour({ description: "", cost: 0 });
     }
-  };
-
-  const removeTour = (index: number) => {
-    setFormData((prev) => ({
-      ...prev,
-      tours: {
-        ...prev.tours,
-        tour_options: (prev.tours?.tour_options || []).filter((_, i) => i !== index),
-      } as Tours,
-    }));
   };
 
   const addOtherFeature = () => {
@@ -320,7 +307,7 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
 
         <div className="form-control">
           <label className="label flex items-center gap-1">
-            Select AVA 
+            Select AVA
             <FaMapMarkerAlt style={{ color: "#5A0C2C" }} />
           </label>
           <select
@@ -403,8 +390,8 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
               min={0}
               step="0.01"
             />
-            <button type="button" className="btn btn-primary" onClick={addTour}>
-              Add Tour
+            <button type="button" className="btn btn-primary" onClick={submitTour}>
+              Submit
             </button>
           </div>
           <div className="mt-2">
@@ -413,7 +400,19 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
                 <span>
                   {tour.description}: ${tour.cost}
                 </span>
-                <button type="button" className="btn btn-xs btn-error" onClick={() => removeTour(index)}>
+                <button
+                  type="button"
+                  className="btn btn-xs btn-error"
+                  onClick={() =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      tours: {
+                        ...prev.tours,
+                        tour_options: [],
+                      } as Tours,
+                    }))
+                  }
+                >
                   Remove
                 </button>
               </div>
@@ -499,7 +498,7 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
               step="0.01"
             />
             <button type="button" className="btn btn-primary" onClick={addFoodPairingOption}>
-              Add Food Available 
+              Add Food Available
             </button>
           </div>
           <div className="mt-2">
