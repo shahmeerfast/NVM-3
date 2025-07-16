@@ -7,6 +7,8 @@ import { fileUpload } from "@/lib/fileUpload";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect } from "react";
 const initialState: Winery = {
   name: "",
   description: "",
@@ -52,6 +54,23 @@ export default function WineryAdminStepperPage() {
   const [availableSlotDates, setAvailableSlotDates] = useState<Date[]>([]);
   const [loading, setLoading] = useState(false);
   const formRef = useRef<HTMLFormElement | null>(null);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const wineryId = searchParams.get("id");
+
+  useEffect(() => {
+    if (wineryId) {
+      setLoading(true);
+      axios.get(`/api/winery/${wineryId}`)
+        .then(res => {
+          if (res.data && res.data.winery) {
+            setFormData(res.data.winery);
+          }
+        })
+        .catch(() => toast.error("Failed to load winery for editing."))
+        .finally(() => setLoading(false));
+    }
+  }, [wineryId]);
 
   const handleNext = () => setActiveStep((prev) => prev + 1);
   const handleBack = () => setActiveStep((prev) => prev - 1);
@@ -60,21 +79,31 @@ export default function WineryAdminStepperPage() {
     setLoading(true);
     try {
       const filesUrls = await fileUpload(uploadedFiles);
-      formData.images = filesUrls;
-      console.log("formdata", formData);
-      await axios.post("/api/winery", formData);
-
+      formData.images = filesUrls.length > 0 ? filesUrls : formData.images;
+      if (wineryId) {
+        // Update existing winery
+        await axios.patch(`/api/admin/wineries/${wineryId}`, formData);
+        toast.success("Winery updated successfully!", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: true,
+        });
+      } else {
+        // Create new winery
+        await axios.post("/api/winery", formData);
+        toast.success("Winery added successfully!", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: true,
+        });
+      }
       setFormData({ ...initialState });
       setUploadedFiles([]);
       setAvailableSlotDates([]);
       setActiveStep(0);
-      toast.success("Winery added successfully!", {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: true,
-      });
+      router.push("/admin/dashboard/winery/list");
     } catch (error) {
-      toast.error("Error adding winery. Please try again.", {
+      toast.error("Error saving winery. Please try again.", {
         position: "top-right",
         autoClose: 3000,
         hideProgressBar: true,
@@ -107,7 +136,7 @@ export default function WineryAdminStepperPage() {
   return (
     <div className="min-h-screen p-4 bg-gray-100 relative top-20">
       <div className="container mx-auto max-w-4xl bg-base-100 p-5 relative">
-        <h1 className="text-3xl font-bold text-center mb-6">Add New Winery</h1>
+        <h1 className="text-3xl font-bold text-center mb-6">{wineryId ? "Edit Winery" : "Add New Winery"}</h1>
         <div className="steps mb-4">
           <div className={`step ${activeStep >= 0 ? "step-primary" : ""}`}>Basic Info</div>
           <div className={`step ${activeStep >= 1 ? "step-primary" : ""}`}>Tasting & Booking</div>
@@ -135,7 +164,7 @@ export default function WineryAdminStepperPage() {
               </button>
             ) : (
               <button onClick={handleSubmit} className="btn btn-success ml-auto" disabled={loading}>
-                Submit Winery
+                {wineryId ? "Update Winery" : "Submit Winery"}
               </button>
             )}
           </div>

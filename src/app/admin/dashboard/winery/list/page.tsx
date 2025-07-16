@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import useSWR from "swr";
+import { useRouter } from "next/navigation";
 
 // Simple fetcher for SWR
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -9,6 +10,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 export default function WineryListPage() {
   const [page, setPage] = useState(1);
   const limit = 10;
+  const router = useRouter();
 
   const { data, error, mutate } = useSWR(`/api/admin/wineries?page=${page}&limit=${limit}`, fetcher);
 
@@ -88,6 +90,15 @@ export default function WineryListPage() {
             <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+          </button>
+          <button
+            className="mr-2 bg-green-600 hover:bg-green-700 text-white p-2 rounded-md shadow-sm transition-all duration-200 ease-in-out"
+            onClick={() => router.push(`/admin/dashboard/winery?id=${winery._id}`)}
+            title="Edit"
+          >
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5h2m-1 0v14m-7-7h14" />
             </svg>
           </button>
           <button
