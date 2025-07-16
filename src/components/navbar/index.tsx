@@ -9,6 +9,7 @@ import { MdExplore, MdOutlineSupportAgent, MdSupport } from "react-icons/md";
 import { VoiceFilter } from "../filter-bar/voice-filter";
 import { useAuthStore } from "@/store/authStore";
 import { IUser } from "@/models/user.model";
+import { useRouter } from "next/navigation";
 
 export function Navbar() {
   const { itinerary } = useItinerary();
@@ -16,6 +17,7 @@ export function Navbar() {
   const [loading, setLoading] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     if (!user) {
@@ -28,6 +30,7 @@ export function Navbar() {
       setLoading(true);
       await logout();
       setIsProfileMenuOpen(false);
+      router.push("/");
     } catch (error) {
       console.error("Logout failed", error);
     } finally {
@@ -75,7 +78,7 @@ export function Navbar() {
               <NavbarLink href="/bookings" text="Your Bookings" />
               <NavbarLink href="/support" text="Support" />
               <NavbarLink href="#contact" text="Contact" />
-              {user?.role === "admin" && <NavbarLink href="/admin/dashboard" text="Dashboard" />}
+              {(user?.role === "admin" || user?.role === "winery") && <NavbarLink href="/admin/dashboard" text="Dashboard" />}
             </nav>
 
             <div className="flex items-center space-x-6">
@@ -200,7 +203,7 @@ const MobileBottomNav = ({
           <div className="flex flex-col items-center space-y-4">
             <FaUserAlt size={50} className="text-gray-800 rounded-full" />
             <span className="font-semibold text-lg text-gray-800">{user.name}</span>
-            {user.role === "admin" && (
+            {(user.role === "admin" || user.role === "winery") && (
               <Link href={"/admin/dashboard"} className="text-gray-600 text-sm font-semibold w-full text-center py-2">
                 Dashboard
               </Link>

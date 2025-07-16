@@ -11,7 +11,7 @@ export async function POST(req: Request) {
     if (existingUser) {
       return NextResponse.json({ error: "Email already in use" }, { status: 400 });
     }
-    const newUser = await User.create({ name, email, password });
+    const newUser = await User.create({ name, email, password, role: "winery" });
     const token = createToken(newUser._id.toString());
     await setTokenCookie(token);
     return NextResponse.json({ success: true, user: newUser }, { status: 201 });

@@ -90,6 +90,7 @@ const WinerySchema = new mongoose.Schema({
     lyft_availability: { type: Boolean, default: false },
     distance_from_user: { type: Number, min: 0 },
   },
+  owner: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }, // User who owns this winery
 });
 
 // Check if the model is already defined

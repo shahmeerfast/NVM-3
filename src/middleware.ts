@@ -22,7 +22,7 @@ export async function middleware(request: NextRequest) {
     if (!token) return NextResponse.redirect(new URL("/", request.url));
     const payload = await verifyToken(token.value, secret);
 
-    if (!payload || payload.role !== "admin") {
+    if (!payload) {
       return NextResponse.redirect(new URL("/", request.url));
     }
   }
