@@ -34,7 +34,6 @@ export async function POST(req: NextRequest) {
       foodPairings: winery.foodPairings,
     }));
     await booking.save();
-
     for (const winery of data) {
       const wineryDetails = await WineryModel.findById(winery.wineryId).select("name contact_info.email");
       if (wineryDetails) {
