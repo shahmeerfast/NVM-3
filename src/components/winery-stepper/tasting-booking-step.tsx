@@ -23,7 +23,8 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
   setAvailableSlotDates,
 }) => {
   const [foodPairingOption, setFoodPairingOption] = useState({ id: "", name: "", price: 0 });
-  const [newWine, setNewWine] = useState({ id: "", name: "", description: "" });
+  const [newWine, setNewWine] = useState({ id: "", name: "", description: "", year: "", tasting_notes: "", photo: "" });
+  const [winePhotoFiles, setWinePhotoFiles] = useState<File[]>([]);
   const [newTasting, setNewTasting] = useState({ id: "", name: "", description: "", price: 0, timeslot: "" });
   const [newTour, setNewTour] = useState({ description: "", cost: 0 });
   const [otherFeature, setOtherFeature] = useState({ description: "", cost: 0 });
@@ -78,10 +79,18 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
         ...prev,
         wine_details: [
           ...((prev.wine_details as WineDetail[]) || []),
-          { id: crypto.randomUUID(), name: newWine.name, description: newWine.description },
+          {
+            id: crypto.randomUUID(),
+            name: newWine.name,
+            description: newWine.description,
+            year: newWine.year ? parseInt(newWine.year) : undefined,
+            tasting_notes: newWine.tasting_notes,
+            photo: winePhotoFiles[0] ? URL.createObjectURL(winePhotoFiles[0]) : undefined,
+          },
         ],
       }));
-      setNewWine({ id: "", name: "", description: "" });
+      setNewWine({ id: "", name: "", description: "", year: "", tasting_notes: "", photo: "" });
+      setWinePhotoFiles([]);
     }
   };
 
@@ -354,6 +363,22 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
               value={newWine.description || ""}
               onChange={(e) => setNewWine({ ...newWine, description: e.target.value })}
             />
+            <input
+              type="number"
+              placeholder="Wine year"
+              className="input input-bordered w-full"
+              value={newWine.year || ""}
+              onChange={(e) => setNewWine({ ...newWine, year: e.target.value })}
+            />
+            <input
+              type="text"
+              placeholder="Tasting notes"
+              className="input input-bordered w-full"
+              value={newWine.tasting_notes || ""}
+              onChange={(e) => setNewWine({ ...newWine, tasting_notes: e.target.value })}
+            />
+            {/* Replace wine photo URL input with MultipleImageUpload */}
+            <MultipleImageUpload files={winePhotoFiles} onChange={setWinePhotoFiles} />
             <button type="button" className="btn btn-primary" onClick={addWine}>
               Add Wine
             </button>

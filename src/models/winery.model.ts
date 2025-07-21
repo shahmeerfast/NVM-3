@@ -45,9 +45,12 @@ const WinerySchema = new mongoose.Schema({
   tours: ToursSchema,
   wine_details: [
     {
-      id: { type: String, required: true }, 
+      id: { type: String, required: true },
       name: { type: String, required: true },
       description: { type: String, required: true },
+      year: { type: Number },
+      tasting_notes: { type: String },
+      photo: { type: String },
     },
   ],
 
