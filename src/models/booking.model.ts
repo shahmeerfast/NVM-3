@@ -12,7 +12,6 @@ interface WineryBooking {
   tour: number | null;
   foodPairings: FoodPairing[];
 }
-
 const foodPairingSchema = new Schema<FoodPairing>(
   {
     name: { type: String, required: true },
