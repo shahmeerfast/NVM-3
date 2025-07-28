@@ -28,6 +28,14 @@ export default function ItinerarySummary({ wineries, onConfirm }: ItinerarySumma
           wineryCost += bookingDetails.foodPairings.reduce((sum, pairing) => sum + pairing.price, 0);
         }
 
+        // Add tour prices if selected
+        if (bookingDetails?.tours) {
+          wineryCost += bookingDetails.tours.reduce((sum, tour) => sum + tour.price, 0);
+        }
+        if (bookingDetails?.otherFeature) {
+          wineryCost += bookingDetails.otherFeature.reduce((sum, feature) => sum + feature.price, 0);
+        }
+
         return total + wineryCost;
       }, 0);
     };
@@ -54,15 +62,20 @@ export default function ItinerarySummary({ wineries, onConfirm }: ItinerarySumma
                 <span className="font-medium">{winery.name}</span>
                 {winery.bookingDetails &&
                 (winery.bookingDetails.tasting ||
-                  winery.bookingDetails.foodPairings?.length > 0) ? (
+                  winery.bookingDetails.foodPairings?.length > 0 ||
+                  winery.bookingDetails.tours?.length > 0) ? (
                   <ul className="ml-4 list-disc">
                     {winery.bookingDetails?.tasting && winery.tasting_info?.tasting_price && (
                       <li>Tasting: ${winery.tasting_info.tasting_price.toFixed(2)}</li>
                     )}
-          
                     {winery.bookingDetails?.foodPairings?.map((pairing) => (
                       <li key={pairing.name}>
                         {pairing.name}: ${pairing.price.toFixed(2)}
+                      </li>
+                    ))}
+                    {winery.bookingDetails?.tours?.map((tour) => (
+                      <li key={tour.description}>
+                        {tour.description}: ${tour.price.toFixed(2)}
                       </li>
                     ))}
                   </ul>

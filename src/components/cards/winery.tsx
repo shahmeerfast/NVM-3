@@ -23,6 +23,8 @@ export default function WineryBookingCard({ winery, onUpdate, onRemove }: Winery
   const [selections, setSelections] = useState({
     tasting: false,
     foodPairings: [] as { name: string; price: number }[],
+    tours: [] as { description: string; price: number }[],
+    otherFeature: [] as { description: string; price: number }[],
   });
 
   useEffect(() => {
@@ -46,6 +48,8 @@ export default function WineryBookingCard({ winery, onUpdate, onRemove }: Winery
       selectedTime,
       tasting: selections.tasting,
       foodPairings: selections.foodPairings,
+      tours: selections.tours || [],
+      otherFeature: selections.otherFeature || [],
     });
   }, [selectedDate, selectedTime, selections, winery._id, winery.name, onUpdate]);
 
@@ -78,11 +82,41 @@ const handleFoodPairingChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
 
   setSelections((prev) => ({ ...prev, foodPairings: selectedOptions }));
 };
+const handleTourChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const selectedValue = e.target.value;
+
+  if (!selectedValue) {
+    setSelections((prev) => ({ ...prev, tours: [] }));
+    return;
+  }
+
+  const selectedOptions = Array.from(e.target.selectedOptions, (option) => ({
+    description: option.value,
+    price: Number(option.dataset.price) || 0,
+  }));
+
+  setSelections((prev) => ({ ...prev, tours: selectedOptions }));
+};
+const handleChangeOther = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const selectedValue = e.target.value;
+
+  if (!selectedValue) {
+    setSelections((prev) => ({ ...prev, otherFeature: [] }));
+    return;
+  }
+
+  const selectedOptions = Array.from(e.target.selectedOptions, (option) => ({
+    description: option.value,
+    price: Number(option.dataset.price) || 0,
+  }));
+
+  setSelections((prev) => ({ ...prev, otherFeature: selectedOptions }));
+};
 
   useEffect(() => {
-    setSelections((prev) => ({ ...prev, foodPairings: [] }));
+    setSelections((prev) => ({ ...prev, foodPairings: [], tours: [], otherFeature: [] }));
   }, [winery.tasting_info]);
-
+console.log(winery);
   return (
     <div className="card shadow-sm bg-white rounded-xl p-4 md:p-6 flex flex-col md:flex-row gap-4 items-start w-full">
       <div className="flex-grow bg-white w-full">
@@ -154,6 +188,54 @@ const handleFoodPairingChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
                   {winery.food_pairing_options.map((option) => (
                     <option key={option.name} value={option.name} data-price={option.price}>
                       {option.name} (${option.price.toFixed(2)})
+                    </option>
+                  ))}
+                </>
+              ) : (
+                <option value="" disabled>
+                  No pairings available
+                </option>
+              )}
+            </select>
+          </div>
+            <div className="w-full md:w-1/3">
+            <label className="block text-xs font-medium text-gray-600">Tour</label>
+            <select
+              className="select select-bordered w-full text-sm h-10"
+              onChange={handleTourChange}
+            >
+              {winery?.tours.tour_options?.length > 0 ? (
+                <>
+                  <option value="">
+                    Select Tour
+                  </option>
+                  {winery.tours.tour_options?.map((option) => (
+                    <option key={option.description} value={option.description} data-price={option.cost}>
+                      {option.description} (${option.cost.toFixed(2)})
+                    </option>
+                  ))}
+                </>
+              ) : (
+                <option value="" disabled>
+                  No pairings available
+                </option>
+              )}
+            </select>
+          </div>
+                  <div className="w-full md:w-1/3">
+            <label className="block text-xs font-medium text-gray-600">Other Features</label>
+            <select
+              className="select select-bordered w-full text-sm h-10"
+              onChange={handleChangeOther}
+            >
+              {winery?.booking_info.other_features?.length > 0 ? (
+                <>
+                  <option value="">
+                    Select Other Feature
+                  </option>
+                  {winery.booking_info.other_features?.map((option) => (
+                    <option key={option.description} value={option.description} data-price={option.cost}>
+                      {option.description} (${option.cost.toFixed(2)})
                     </option>
                   ))}
                 </>

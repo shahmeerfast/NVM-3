@@ -7,6 +7,9 @@ export interface BookingData {
   selectedTime: string;
   tasting: boolean;
   foodPairings: { name: string; price: number }[];
+  tours: { description: string; price: number }[];
+  otherFeature: { description: string; price: number }[];
+
 }
 
 export type ItineraryWinery = Winery & { bookingDetails?: BookingData };
