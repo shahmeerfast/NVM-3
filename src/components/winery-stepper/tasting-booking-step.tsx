@@ -419,7 +419,7 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
           <select
             className="select select-bordered"
             value={tasting.ava || ""}
-            onChange={(e) => handleSelectChange(index, "ava")(e)}
+            onChange={handleSelectChange(index, "ava")}
           >
             <option value="">Select AVA</option>
             {regions.map((ava) => (

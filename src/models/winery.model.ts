@@ -1,5 +1,12 @@
 import mongoose from "mongoose";
 
+// FoodPairingOption Schema
+const FoodPairingOptionSchema = new mongoose.Schema({
+  id: { type: String, required: true, default: () => crypto.randomUUID() },
+  name: { type: String, required: true },
+  price: { type: Number, required: true, min: 0 },
+});
+
 // Tours Schema
 const ToursSchema = new mongoose.Schema({
   available: { type: Boolean, default: false },
@@ -8,9 +15,57 @@ const ToursSchema = new mongoose.Schema({
     {
       description: { type: String, required: true },
       cost: { type: Number, required: true, min: 0 },
-      tour_id: { type: String }, // Optional, matches interface
+      tour_id: { type: String }, // Optional
     },
   ],
+});
+
+// WineDetail Schema
+const WineDetailSchema = new mongoose.Schema({
+  id: { type: String, required: true, default: () => crypto.randomUUID() },
+  name: { type: String, required: true },
+  description: { type: String, required: true },
+  year: { type: Number },
+  tasting_notes: { type: String },
+  photo: { type: String },
+});
+
+// BookingInfo Schema
+const BookingInfoSchema = new mongoose.Schema({
+  booking_enabled: { type: Boolean, default: false },
+  max_guests_per_slot: { type: Number, min: 0 },
+  number_of_people: [{ type: Number, min: 0 }],
+  dynamic_pricing: {
+    enabled: { type: Boolean, default: false },
+    weekend_multiplier: { type: Number, min: 0 },
+  },
+  available_slots: [{ type: String }],
+  external_booking_link: { type: String },
+});
+
+// OtherFeature Schema
+const OtherFeatureSchema = new mongoose.Schema({
+  description: { type: String, required: true },
+  cost: { type: Number, required: true, min: 0 },
+  feature_id: { type: String },
+});
+
+// TastingInfo Schema
+const TastingInfoSchema = new mongoose.Schema({
+  tasting_title: { type: String, required: true },
+  tasting_description: { type: String, required: true },
+  ava: { type: String },
+  tasting_price: { type: Number, required: true, min: 0 },
+  available_times: [{ type: String }],
+  wine_types: [{ type: String }],
+  number_of_wines_per_tasting: { type: Number, min: 1, default: 1 },
+  special_features: [{ type: String }],
+  images: [{ type: String }],
+  food_pairing_options: [FoodPairingOptionSchema],
+  tours: ToursSchema,
+  wine_details: [WineDetailSchema],
+  booking_info: BookingInfoSchema,
+  other_features: [OtherFeatureSchema],
 });
 
 // Winery Schema
@@ -28,53 +83,7 @@ const WinerySchema = new mongoose.Schema({
     website: { type: String },
   },
   description: { type: String },
-  images: [{ type: String }],
-  tasting_info: {
-    tasting_price: { type: Number, required: true, min: 0 },
-    available_times: [{ type: String }],
-    wine_types: [{ type: String }],
-    number_of_wines_per_tasting: { type: Number, min: 1, default: 1 },
-    special_features: [{ type: String }],
-  },
-  food_pairing_options: [
-      {
-        name: { type: String, required: true },
-        price: { type: Number, required: true, min: 0 },
-      },
-  ],
-  tours: ToursSchema,
-  wine_details: [
-    {
-      id: { type: String, required: true },
-      name: { type: String, required: true },
-      description: { type: String, required: true },
-      year: { type: Number },
-      tasting_notes: { type: String },
-      photo: { type: String },
-    },
-  ],
-
-  ava: { type: String },
-  booking_info: {
-    booking_enabled: { type: Boolean, default: false },
-    max_guests_per_slot: { type: Number, min: 0 },
-    number_of_people: [{ type: Number, min: 0 }],
-    dynamic_pricing: {
-      enabled: { type: Boolean, default: false },
-      weekend_multiplier: { type: Number, min: 0 },
-    },
-    available_slots: [{ type: String }],
-    external_booking_link: { type: String },
-    other_features: [
-      {
-        description: { type: String, required: true },
-        cost: { type: Number, required: true, min: 0 },
-        feature_id: { type: String },
-      },
-    ],
-    payment_method: { type: String }, 
-    total: { type: Number, min: 0 },
-  },
+  tasting_info: [TastingInfoSchema],
   amenities: {
     virtual_sommelier: { type: Boolean, default: false },
     augmented_reality_tours: { type: Boolean, default: false },
@@ -93,7 +102,7 @@ const WinerySchema = new mongoose.Schema({
     lyft_availability: { type: Boolean, default: false },
     distance_from_user: { type: Number, min: 0 },
   },
-  owner: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }, // User who owns this winery
+  owner: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
 });
 
 // Check if the model is already defined
