@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { Winery } from "@/app/interfaces";
 import { BasicInfoForm } from "@/components/winery-stepper/basic-info-step";
 import { TastingBookingForm } from "@/components/winery-stepper/tasting-booking-step";
@@ -8,43 +8,46 @@ import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect } from "react";
+
 const initialState: Winery = {
   name: "",
   description: "",
   location: { address: "", latitude: 0, longitude: 0, is_mountain_location: false },
   contact_info: { email: "", phone: "", website: "" },
-  images: [],
-  food_pairing_options: [],
-  tasting_info: {
-    tasting_description: "",
-    tasting_title: "",
-    tasting_price: 0,
-    available_times: [],
-    wine_types: [],
-    number_of_wines_per_tasting: 1,
-    special_features: [],
-  },
-  tours: {
-    available: false,
-    tour_price: 0,
-    tour_options: [],
-  },
-  wine_details: [],
-  ava: "",
-  booking_info: {
-    booking_enabled: false,
-    max_guests_per_slot: 0,
-    number_of_people: [1, 2],
-    dynamic_pricing: { enabled: false, weekend_multiplier: 0 },
-    available_slots: [],
-    external_booking_link: "",
-    other_features: [],
-    payment_method: "pay_winery",
-  },
+  tasting_info: [
+    {
+      tasting_title: "",
+      tasting_description: "",
+      tasting_price: 0,
+      available_times: [],
+      wine_types: [],
+      number_of_wines_per_tasting: 1,
+      special_features: [],
+      images: [],
+      tasting_info: {} as any, // Placeholder, as per interface
+      food_pairing_options: [],
+      ava: "",
+      tours: {
+        available: false,
+        tour_price: 0,
+        tour_options: [],
+      },
+      wine_details: [],
+      booking_info: {
+        booking_enabled: false,
+        max_guests_per_slot: 0,
+        number_of_people: [1, 10],
+        dynamic_pricing: { enabled: false, weekend_multiplier: 1 },
+        available_slots: [],
+        external_booking_link: "",
+      },
+      other_features: [],
+    },
+  ],
   amenities: { virtual_sommelier: false, augmented_reality_tours: false, handicap_accessible: false },
   user_reviews: [],
   transportation: { uber_availability: false, lyft_availability: false, distance_from_user: 0 },
+  payment_method: "pay_winery",
 };
 
 export default function WineryAdminStepperPage() {
@@ -61,8 +64,9 @@ export default function WineryAdminStepperPage() {
   useEffect(() => {
     if (wineryId) {
       setLoading(true);
-      axios.get(`/api/winery/${wineryId}`)
-        .then(res => {
+      axios
+        .get(`/api/winery/${wineryId}`)
+        .then((res) => {
           if (res.data && res.data.winery) {
             setFormData(res.data.winery);
           }
@@ -78,11 +82,22 @@ export default function WineryAdminStepperPage() {
   const handleSubmit = async () => {
     setLoading(true);
     try {
+      // Upload files and distribute URLs across tastings
       const filesUrls = await fileUpload(uploadedFiles);
-      formData.images = filesUrls.length > 0 ? filesUrls : formData.images;
+      const updatedFormData = { ...formData };
+      if (filesUrls.length > 0) {
+        updatedFormData.tasting_info = updatedFormData.tasting_info.map((tasting, index) => ({
+          ...tasting,
+          images: filesUrls.slice(
+            index * Math.ceil(filesUrls.length / updatedFormData.tasting_info.length),
+            (index + 1) * Math.ceil(filesUrls.length / updatedFormData.tasting_info.length)
+          ),
+        }));
+      }
+
       if (wineryId) {
         // Update existing winery
-        await axios.patch(`/api/admin/wineries/${wineryId}`, formData);
+        await axios.patch(`/api/admin/wineries/${wineryId}`, updatedFormData);
         toast.success("Winery updated successfully!", {
           position: "top-right",
           autoClose: 3000,
@@ -90,7 +105,7 @@ export default function WineryAdminStepperPage() {
         });
       } else {
         // Create new winery
-        await axios.post("/api/winery", formData);
+        await axios.post("/api/winery", updatedFormData);
         toast.success("Winery added successfully!", {
           position: "top-right",
           autoClose: 3000,

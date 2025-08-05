@@ -30,6 +30,15 @@ export interface TastingInfo {
   wine_types: string[];
   number_of_wines_per_tasting:number;
   special_features: string[];
+  images: string[];
+  tasting_info: TastingInfo;
+  food_pairing_options: FoodPairingOption[];
+  tours: Tours;
+  wine_details: WineDetail[];
+  booking_info: BookingInfo;
+  other_features: { description: string; cost: number }[];
+  ava: string;
+
 }
 
 // Tours.ts
@@ -64,8 +73,6 @@ export interface BookingInfo {
   dynamic_pricing: DynamicPricing;
   available_slots: string[];
   external_booking_link?: string;
-  other_features: { description: string; cost: number }[];
-  payment_method: string
 }
 
 // Amenities.ts
@@ -97,16 +104,12 @@ export interface Winery {
   location: Location;
   contact_info: ContactInfo;
   description: string;
-  images: string[];
-  tasting_info: TastingInfo;
-  food_pairing_options: FoodPairingOption[];
-  tours: Tours;
-  wine_details: WineDetail[];
-  ava: string;
-  booking_info: BookingInfo;
+  tasting_info: TastingInfo[];
   amenities: Amenities;
   user_reviews: UserReview[];
   transportation: Transportation;
+  payment_method: string
+
 }
 
 
