@@ -25,9 +25,10 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
 }) => {
   const [foodPairingOption, setFoodPairingOption] = useState<FoodPairingOption>({ id: "", name: "", price: 0 });
   const [newWine, setNewWine] = useState<WineDetail>({ id: "", name: "", description: "", year: undefined, tasting_notes: "", photo: "" });
-  const [winePhotoFiles, setWinePhotoFiles] = useState<File[]>([]);
   const [newTour, setNewTour] = useState<{ description: string; cost: number }>({ description: "", cost: 0 });
   const [otherFeature, setOtherFeature] = useState<{ description: string; cost: number }>({ description: "", cost: 0 });
+  const [tastingImages, setTastingImages] = useState<{ [key: number]: File[] }>({});
+  const [tastingWinePhotos, setTastingWinePhotos] = useState<{ [key: number]: File[] }>({});
 
   const addTasting = (index: number) => () => {
     const newTasting: TastingInfo = {
@@ -38,7 +39,7 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
       wine_types: [],
       number_of_wines_per_tasting: 1,
       special_features: [],
-      images: uploadedFiles.map((file) => URL.createObjectURL(file)),
+      images: [],
       tasting_info: {} as TastingInfo,
       food_pairing_options: [],
       tours: { available: false, tour_price: 0, tour_options: [] },
@@ -72,7 +73,7 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
       wine_types: [],
       number_of_wines_per_tasting: 1,
       special_features: [],
-      images: uploadedFiles.map((file) => URL.createObjectURL(file)),
+      images: [],
       tasting_info: {} as TastingInfo,
       food_pairing_options: [],
       tours: { available: false, tour_price: 0, tour_options: [] },
@@ -159,6 +160,7 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
 
   const addWine = (index: number) => () => {
     if (newWine.name && newWine.description) {
+      const currentWinePhotos = tastingWinePhotos[index] || [];
       setFormData((prev) => {
         const updatedTastings = [...prev.tasting_info];
         updatedTastings[index] = {
@@ -171,14 +173,17 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
               description: newWine.description,
               year: newWine.year ? parseInt(newWine.year.toString()) : undefined,
               tasting_notes: newWine.tasting_notes,
-              photo: winePhotoFiles[0] ? URL.createObjectURL(winePhotoFiles[0]) : undefined,
+              photo: currentWinePhotos[0] ? URL.createObjectURL(currentWinePhotos[0]) : undefined,
             },
           ],
         };
         return { ...prev, tasting_info: updatedTastings };
       });
       setNewWine({ id: "", name: "", description: "", year: undefined, tasting_notes: "", photo: "" });
-      setWinePhotoFiles([]);
+      setTastingWinePhotos(prev => ({
+        ...prev,
+        [index]: []
+      }));
     }
   };
 
@@ -278,6 +283,55 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
       updatedTastings[index] = {
         ...updatedTastings[index],
         booking_info: { ...updatedTastings[index].booking_info, number_of_people: newNumberOfPeople as [number, number] },
+      };
+      return { ...prev, tasting_info: updatedTastings };
+    });
+  };
+
+  const handleTastingImagesChange = (index: number) => (files: File[]) => {
+    setTastingImages(prev => ({
+      ...prev,
+      [index]: files
+    }));
+    
+    // Get existing images from the current tasting
+    const currentTasting = formData.tasting_info[index];
+    const existingImages = currentTasting.images || [];
+    
+    // Combine existing images with new uploaded images
+    const newImageUrls = files.map((file) => URL.createObjectURL(file));
+    const allImages = [...existingImages, ...newImageUrls];
+    
+    // Update the tasting images in formData
+    handleTastingChange(index, "images", allImages);
+  };
+
+  // Function to get current images for a tasting (either from uploaded files or existing images)
+  const getTastingImages = (index: number) => {
+    const currentTasting = formData.tasting_info[index];
+    const uploadedFiles = tastingImages[index] || [];
+    
+    // If we have uploaded files, use those
+    if (uploadedFiles.length > 0) {
+      return uploadedFiles;
+    }
+    
+    // Otherwise, return empty array (existing images are already in formData)
+    return [];
+  };
+
+
+  const removeWinePhoto = (tastingIndex: number, wineIndex: number) => {
+    setFormData((prev) => {
+      const updatedTastings = [...prev.tasting_info];
+      const updatedWines = [...updatedTastings[tastingIndex].wine_details];
+      updatedWines[wineIndex] = {
+        ...updatedWines[wineIndex],
+        photo: undefined
+      };
+      updatedTastings[tastingIndex] = {
+        ...updatedTastings[tastingIndex],
+        wine_details: updatedWines
       };
       return { ...prev, tasting_info: updatedTastings };
     });
@@ -439,19 +493,20 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
             </div>
 
             <div className="form-control">
-              <label className="label">Images Upload</label>
+              <label className="label">
+                Images Upload
+              </label>
               <MultipleImageUpload
-                files={uploadedFiles}
-                onChange={(files) => {
-                  setUploadedFiles(files);
-                  handleTastingChange(index, "images", files.map((file) => URL.createObjectURL(file)));
-                }}
+                files={getTastingImages(index)}
+                onChange={handleTastingImagesChange(index)}
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="form-control">
-                <label className="label">Wine</label>
+                <label className="label">
+                  Wine 
+                </label>
                 <div className="space-y-2">
                   <input
                     type="text"
@@ -481,7 +536,13 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
                     value={newWine.tasting_notes || ""}
                     onChange={(e) => setNewWine({ ...newWine, tasting_notes: e.target.value })}
                   />
-                  <MultipleImageUpload files={winePhotoFiles} onChange={setWinePhotoFiles} />
+                  <MultipleImageUpload 
+                    files={tastingWinePhotos[index] || []} 
+                    onChange={(files) => setTastingWinePhotos(prev => ({
+                      ...prev,
+                      [index]: files
+                    }))} 
+                  />
                   <button type="button" className="btn btn-primary" onClick={addWine(index)}>
                     Add Wine
                   </button>
@@ -489,7 +550,29 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
                 <div className="mt-2">
                   {tasting.wine_details?.map((wine, wineIndex) => (
                     <div key={wine.id} className="flex justify-between items-center p-2 border-b">
-                      <span>{wine.name}</span>
+                      <div className="flex items-center gap-2">
+                        {wine.photo && (
+                          <div className="relative">
+                            <img 
+                              src={wine.photo} 
+                              alt={wine.name}
+                              className="w-8 h-8 object-cover rounded"
+                            />
+                            <button
+                              type="button"
+                              className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs"
+                              onClick={() => removeWinePhoto(index, wineIndex)}
+                            >
+                              ×
+                            </button>
+                          </div>
+                        )}
+                        <div className="flex flex-col">
+                          <span className="font-medium">{wine.name}</span>
+                          {wine.year && <span className="text-sm text-gray-500">({wine.year})</span>}
+                          {wine.description && <span className="text-xs text-gray-600 truncate max-w-32">{wine.description}</span>}
+                        </div>
+                      </div>
                       <button type="button" className="btn btn-xs btn-error" onClick={() => removeWine(index, wineIndex)}>
                         Remove
                       </button>
@@ -499,7 +582,9 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
               </div>
 
               <div className="form-control">
-                <label className="label">Tour (Optional)</label>
+                <label className="label">
+                  Tour (Optional)
+                </label>
                 <div className="space-y-2">
                   <input
                     type="text"
@@ -538,7 +623,9 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
 
             <div className="grid grid-cols-2 gap-4">
               <div className="form-control">
-                <label className="label">Food Available</label>
+                <label className="label">
+                  Food Available
+                </label>
                 <div className="space-y-2">
                   <input
                     type="text"
@@ -575,7 +662,9 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
               </div>
 
               <div className="form-control">
-                <label className="label">Other Features</label>
+                <label className="label">
+                  Other Features
+                </label>
                 <div className="space-y-2">
                   <input
                     type="text"
