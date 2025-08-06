@@ -22,57 +22,140 @@ const Filter = ({ wineries, onFilterApply }: FilterProps) => {
     setIsLoading(true);
     let filtered = wineries;
 
-    // Filter by tasting price
-    filtered = filtered.filter(
-      (winery) =>
-        winery.tasting_info.tasting_price >= filters.priceRange[0] &&
-        winery.tasting_info.tasting_price <= filters.priceRange[1]
-    );
+    // Filter by tasting price range
+    filtered = filtered.filter((winery) => {
+      if (!winery.tasting_info || winery.tasting_info.length === 0) return false;
+      
+      // Check if any tasting falls within the price range
+      return winery.tasting_info.some(tasting => 
+        tasting.tasting_price >= filters.priceRange[0] && 
+        tasting.tasting_price <= filters.priceRange[1]
+      );
+    });
+
+    // Filter by tasting price specifically
+    if (filters.tastingPrice !== undefined) {
+      filtered = filtered.filter((winery) => {
+        if (!winery.tasting_info || winery.tasting_info.length === 0) return false;
+        
+        // Check if any tasting is within the tasting price range
+        return winery.tasting_info.some(tasting => 
+          tasting.tasting_price <= filters.tastingPrice
+        );
+      });
+    }
 
     // Filter by number of wines per tasting
-    filtered = filtered.filter(
-      (winery) =>
-         winery.tasting_info.number_of_wines_per_tasting >= filters.numberOfWines[0] &&
-        winery.tasting_info.number_of_wines_per_tasting <= filters.numberOfWines[1]
-    );
+    filtered = filtered.filter((winery) => {
+      if (!winery.tasting_info || winery.tasting_info.length === 0) return false;
+      
+      // Check if any tasting has the required number of wines
+      return winery.tasting_info.some(tasting =>
+        tasting.number_of_wines_per_tasting >= filters.numberOfWines[0] &&
+        tasting.number_of_wines_per_tasting <= filters.numberOfWines[1]
+      );
+    });
 
     // Filter by number of people
-    filtered = filtered.filter(
-      (winery) =>
-        winery.booking_info.number_of_people[0] >= filters.numberOfPeople[0] &&
-        winery.booking_info.number_of_people[1] <= filters.numberOfPeople[1]
-    );
+    filtered = filtered.filter((winery) => {
+      if (!winery.tasting_info || winery.tasting_info.length === 0) return false;
+      
+      // Check if any tasting has the required number of people
+      return winery.tasting_info.some(tasting => {
+        if (!tasting.booking_info?.number_of_people) return false;
+        return tasting.booking_info.number_of_people.some(people =>
+          people >= filters.numberOfPeople[0] && people <= filters.numberOfPeople[1]
+        );
+      });
+    });
 
     // Filter by wine type
     if (Object.values(filters.wineType).some((value) => value)) {
-      filtered = filtered.filter((winery) =>
-        Object.keys(filters.wineType).some(
-          (type) =>
-            filters.wineType[type as keyof typeof filters.wineType] &&
-            winery.tasting_info.wine_types.some((wineType) => wineType.toLowerCase() === type.toLowerCase())
-        )
-      );
+      filtered = filtered.filter((winery) => {
+        if (!winery.tasting_info || winery.tasting_info.length === 0) return false;
+        
+        // Check if any tasting has the required wine types
+        return winery.tasting_info.some(tasting => {
+          if (!tasting.wine_types || !Array.isArray(tasting.wine_types)) return false;
+          
+          return Object.keys(filters.wineType).some(
+            (type) =>
+              filters.wineType[type as keyof typeof filters.wineType] &&
+              tasting.wine_types.some((wineType) => wineType.toLowerCase() === type.toLowerCase())
+          );
+        });
+      });
     }
 
     // Filter by AVA
-    if (filters.ava.length > 0) filtered = filtered.filter((winery) => filters.ava.includes(winery.ava));
+    if (filters.ava.length > 0) {
+      filtered = filtered.filter((winery) => {
+        if (!winery.tasting_info || winery.tasting_info.length === 0) return false;
+        
+        // Check if any tasting is in the selected AVA
+        return winery.tasting_info.some(tasting => 
+          tasting.ava && filters.ava.includes(tasting.ava)
+        );
+      });
+    }
 
     // Filter by available time
-    if (filters.time)
-      filtered = filtered.filter((winery) =>
-        winery.tasting_info.available_times.some((time) => filters.time.toLowerCase() === time.toLowerCase())
-      );
+    if (filters.time) {
+      filtered = filtered.filter((winery) => {
+        if (!winery.tasting_info || winery.tasting_info.length === 0) return false;
+        
+        // Check if any tasting has the required time
+        return winery.tasting_info.some(tasting => {
+          if (!tasting.available_times || !Array.isArray(tasting.available_times)) return false;
+          
+          return tasting.available_times.some((time) => filters.time.toLowerCase() === time.toLowerCase());
+        });
+      });
+    }
 
     // Filter by special features
     if (filters.specialFeatures.length > 0) {
-      filtered = filtered.filter((winery) =>
-        filters.specialFeatures.every((feature) => winery.tasting_info.special_features.includes(feature))
+      filtered = filtered.filter((winery) => {
+        if (!winery.tasting_info || winery.tasting_info.length === 0) return false;
+        
+        // Check if any tasting has all the required special features
+        return winery.tasting_info.some(tasting => {
+          if (!tasting.special_features || !Array.isArray(tasting.special_features)) return false;
+          
+          return filters.specialFeatures.every((feature) => tasting.special_features.includes(feature));
+        });
+      });
+    }
+
+    // Filter by multiple tastings availability
+    if (filters.multipleTastings) {
+      filtered = filtered.filter((winery) => 
+        winery.tasting_info && winery.tasting_info.length > 1
       );
+    }
+
+    // Filter by food pairings availability
+    if (filters.foodPairings) {
+      filtered = filtered.filter((winery) => {
+        if (!winery.tasting_info || winery.tasting_info.length === 0) return false;
+        
+        // Check if any tasting has food pairings
+        return winery.tasting_info.some(tasting =>
+          tasting.food_pairing_options && tasting.food_pairing_options.length > 0
+        );
+      });
     }
 
     // Filter by tour availability
     if (filters.toursAvailable) {
-      filtered = filtered.filter((winery) => winery.tours.available);
+      filtered = filtered.filter((winery) => {
+        if (!winery.tasting_info || winery.tasting_info.length === 0) return false;
+        
+        // Check if any tasting has tours available
+        return winery.tasting_info.some(tasting =>
+          tasting.tours && tasting.tours.available
+        );
+      });
     }
 
     onFilterApply(filtered);
@@ -106,7 +189,10 @@ const Filter = ({ wineries, onFilterApply }: FilterProps) => {
       time: "",
       specialFeatures: [],
       numberOfPeople: [1, 20],
-      toursAvailable: false
+      toursAvailable: false,
+      tastingPrice: 200,
+      multipleTastings: false,
+      foodPairings: false
     });
     setShowResetModal(false);
   };

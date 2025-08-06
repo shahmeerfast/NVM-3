@@ -36,9 +36,31 @@ const FilterComponent: FC<FilterProps> = ({
           </button>
         </div>
 
-        {/* Price Range Filter */}
+        {/* Tasting Price Range Filter */}
         <div className="space-y-4">
-          <label className="text-lg font-medium text-neutral">Price Range</label>
+          <label className="text-lg font-medium text-neutral">Tasting Price Range</label>
+          <div className="relative">
+            <input
+              type="range"
+              name="tastingPrice"
+              min="0"
+              max="200"
+              value={filters.tastingPrice || 200}
+              onChange={handleFilterChange}
+              className="range range-primary w-full"
+              aria-label="Select tasting price range"
+            />
+            <div className="absolute flex justify-between w-full mt-2 text-sm text-neutral">
+              <span>$0</span>
+              <span>${filters.tastingPrice || 200}</span>
+              <span>$200+</span>
+            </div>
+          </div>
+        </div>
+
+        {/* General Price Range Filter */}
+        <div className="space-y-4">
+          <label className="text-lg font-medium text-neutral">Total Price Range</label>
           <div className="relative">
             <input
               type="range"
@@ -89,7 +111,7 @@ const FilterComponent: FC<FilterProps> = ({
             aria-label="Select regions"
           >
             <span className="block text-neutral">
-              {filters.regions.length > 0 ? filters.regions.join(", ") : "Select Regions"}
+              {filters.regions && filters.regions.length > 0 ? filters.regions.join(", ") : "Select Regions"}
             </span>
             <span className="material-icons">{isOpen ? "expand_less" : "expand_more"}</span>
           </div>
@@ -157,6 +179,49 @@ const FilterComponent: FC<FilterProps> = ({
             <span>1 Wines</span>
             <span>{filters.numberOfWines} Wines</span>
             <span>10 Wines</span>
+          </div>
+        </div>
+
+        {/* Tasting Experience Filter */}
+        <div className="space-y-4">
+          <label className="text-lg font-medium text-neutral">Tasting Experience</label>
+          <div className="space-y-2">
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="multiple-tastings"
+                checked={filters.multipleTastings || false}
+                onChange={(e) => handleFilterChange({ target: { name: 'multipleTastings', value: e.target.checked } })}
+                className="checkbox checkbox-primary"
+              />
+              <label htmlFor="multiple-tastings" className="text-sm font-medium text-neutral">
+                Multiple Tasting Options
+              </label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="food-pairings"
+                checked={filters.foodPairings || false}
+                onChange={(e) => handleFilterChange({ target: { name: 'foodPairings', value: e.target.checked } })}
+                className="checkbox checkbox-primary"
+              />
+              <label htmlFor="food-pairings" className="text-sm font-medium text-neutral">
+                Food Pairings Available
+              </label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="tours-available"
+                checked={filters.toursAvailable || false}
+                onChange={(e) => handleFilterChange({ target: { name: 'toursAvailable', value: e.target.checked } })}
+                className="checkbox checkbox-primary"
+              />
+              <label htmlFor="tours-available" className="text-sm font-medium text-neutral">
+                Tours Available
+              </label>
+            </div>
           </div>
         </div>
 

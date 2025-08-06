@@ -5,11 +5,11 @@ import { createContext, useContext, useState, ReactNode } from "react";
 export interface BookingData {
   selectedDate: string;
   selectedTime: string;
+  selectedTastingIndex: number;
   tasting: boolean;
   foodPairings: { name: string; price: number }[];
   tours: { description: string; price: number }[];
   otherFeature: { description: string; price: number }[];
-
 }
 
 export type ItineraryWinery = Winery & { bookingDetails?: BookingData };

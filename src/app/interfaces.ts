@@ -20,32 +20,11 @@ export interface FoodPairingOption {
   price: number;
 }
 
-
-// TastingInfo.ts
-export interface TastingInfo {
-  tasting_title: string;
-  tasting_description: string;
-  tasting_price: number;
-  available_times: string[];
-  wine_types: string[];
-  number_of_wines_per_tasting:number;
-  special_features: string[];
-  images: string[];
-  tasting_info: TastingInfo;
-  food_pairing_options: FoodPairingOption[];
-  tours: Tours;
-  wine_details: WineDetail[];
-  booking_info: BookingInfo;
-  other_features: { description: string; cost: number }[];
-  ava: string;
-
-}
-
 // Tours.ts
 export interface Tours {
   available: boolean;
   tour_price: number;
-  tour_options: { description: string; cost: number }[];
+  tour_options: { description: string; cost: number; tour_id?: string }[];
 }
 
 // WineDetail.ts
@@ -58,7 +37,6 @@ export interface WineDetail {
   photo?: string;
 }
 
-
 // DynamicPricing.ts
 export interface DynamicPricing {
   enabled: boolean;
@@ -69,10 +47,11 @@ export interface DynamicPricing {
 export interface BookingInfo {
   booking_enabled: boolean;
   max_guests_per_slot: number;
-  number_of_people: [number, number];
+  number_of_people: number[];
   dynamic_pricing: DynamicPricing;
   available_slots: string[];
   external_booking_link?: string;
+  other_features: { description: string; cost: number; feature_id?: string }[];
 }
 
 // Amenities.ts
@@ -97,6 +76,24 @@ export interface Transportation {
   distance_from_user: number;
 }
 
+// TastingInfo.ts
+export interface TastingInfo {
+  tasting_title: string;
+  tasting_description: string;
+  ava: string;
+  tasting_price: number;
+  available_times: string[];
+  wine_types: string[];
+  number_of_wines_per_tasting: number;
+  special_features: string[];
+  images: string[];
+  food_pairing_options: FoodPairingOption[];
+  tours: Tours;
+  wine_details: WineDetail[];
+  booking_info: BookingInfo;
+  other_features: { description: string; cost: number; feature_id?: string }[];
+}
+
 // Winery.ts
 export interface Winery {
   _id?: string;
@@ -108,59 +105,8 @@ export interface Winery {
   amenities: Amenities;
   user_reviews: UserReview[];
   transportation: Transportation;
-  payment_method: string
-
+  payment_method: string;
+  food_pairing_options?: FoodPairingOption[];
+  tours?: Tours;
+  wine_details?: WineDetail[];
 }
-
-
-// interface Winery {
-//   winery_id: string;
-//   name: string;
-//   description: string;
-//   location: {
-//     address: string;
-//     latitude: number;
-//     longitude: number;
-//     is_mountain_location: boolean;
-//   };
-//   contact_info: {
-//     email: string;
-//     phone: string;
-//     website: string;
-//   };
-//   images: File[];
-//   tasting_info: {
-//     price_range: { min: number; max: number };
-//     available_times: string[];
-//     wine_types: string[];
-//     number_of_wines_per_tasting: number;
-//     special_features: string[];
-//     food_pairings_available: boolean;
-//   };
-//   wine_details: {
-//     wine_id: string;
-//     name: string;
-//     type: string;
-//     year: number;
-//     tasting_notes: string;
-//     pairing_suggestions: string[];
-//   }[];
-//   ava: string;
-//   booking_info: {
-//     booking_enabled: boolean;
-//     max_guests_per_slot: number;
-//     dynamic_pricing: { enabled: boolean; weekend_multiplier: number };
-//     available_slots: string[];
-//   };
-//   amenities: {
-//     virtual_sommelier: boolean;
-//     augmented_reality_tours: boolean;
-//     handicap_accessible: boolean;
-//   };
-//   user_reviews: any[];
-//   transportation: {
-//     uber_availability: boolean;
-//     lyft_availability: boolean;
-//     distance_from_user: number;
-//   };
-// }

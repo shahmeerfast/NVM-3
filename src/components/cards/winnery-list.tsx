@@ -18,15 +18,34 @@ const WineryCard: FC<WineryCardProps> = ({ winery, addToItinerary }) => {
   const whatsappNumber = winery.contact_info.phone;
   const whatsappLink = whatsappNumber ? `https://wa.me/${whatsappNumber.replace(/\D/g, "")}` : "";
 
+  // Handle multiple tastings
+  const hasMultipleTastings = winery.tasting_info && winery.tasting_info.length > 1;
+  const tastingPrices = winery.tasting_info?.map(t => t.tasting_price) || [];
+  const minPrice = Math.min(...tastingPrices);
+  const maxPrice = Math.max(...tastingPrices);
+  const priceDisplay = hasMultipleTastings 
+    ? `$${minPrice.toFixed(2)} - $${maxPrice.toFixed(2)}`
+    : `$${winery.tasting_info?.[0]?.tasting_price?.toFixed(2) ?? "N/A"}`;
+
+  // Get all wine types from all tastings
+  const allWineTypes = winery.tasting_info?.flatMap(t => t.wine_types) || [];
+  const uniqueWineTypes = [...new Set(allWineTypes)];
+
   return (
     <div className="flex flex-col sm:flex-row items-stretch rounded-xl bg-wine-background transition-all hover:shadow-neumorphismHover ease-in-out duration-300">
       <div className="w-full sm:w-1/3 h-40 sm:h-auto overflow-hidden lg:rounded-l-xl rounded-t-xl">
         <Link href={`/winery/${winery._id}`}>
-          <img
-            src={winery.images[0]}
-            alt={winery.name}
-            className="w-full h-full object-cover transform hover:scale-105 transition-all duration-500"
-          />
+          {winery.images?.[0] || winery.tasting_info?.[0]?.images?.[0] ? (
+            <img
+              src={winery.images?.[0] || winery.tasting_info?.[0]?.images?.[0]}
+              alt={winery.name}
+              className="w-full h-full object-cover transform hover:scale-105 transition-all duration-500"
+            />
+          ) : (
+            <div className="w-full h-full bg-gray-300 flex items-center justify-center">
+              <span className="text-gray-500 text-sm">No image</span>
+            </div>
+          )}
         </Link>
       </div>
 
@@ -38,6 +57,15 @@ const WineryCard: FC<WineryCardProps> = ({ winery, addToItinerary }) => {
             </h2>
           </Link>
           <p className="text-sm text-wine-secondary truncate">{winery.description}</p>
+          
+          {/* Multiple Tasting Indicator */}
+          {hasMultipleTastings && (
+            <div className="mt-2">
+              <span className="inline-block bg-wine-primary/10 text-wine-primary text-xs px-2 py-1 rounded-full">
+                {winery.tasting_info.length} Tasting Options Available
+              </span>
+            </div>
+          )}
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm text-neutral">
@@ -48,14 +76,17 @@ const WineryCard: FC<WineryCardProps> = ({ winery, addToItinerary }) => {
 
           <div className="flex items-center space-x-2">
             <FaDollarSign className="text-wine-accent" />
-            <p>
-             ${winery.tasting_info?.tasting_price?.toFixed(2) ?? "N/A"}
-            </p>
+            <p>{priceDisplay}</p>
           </div>
 
           <div className="flex items-center space-x-2 capitalize">
             <FaWineBottle className="text-wine-accent" />
-            <p>{winery.tasting_info.wine_types.join(", ")}</p>
+            <p>
+              {uniqueWineTypes && uniqueWineTypes.length > 0 
+                ? `${uniqueWineTypes.slice(0, 2).join(", ")}${uniqueWineTypes.length > 2 ? "..." : ""}`
+                : "N/A"
+              }
+            </p>
           </div>
         </div>
 

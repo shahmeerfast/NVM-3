@@ -9,6 +9,9 @@ export type Filters = {
   specialFeatures: string[];
   numberOfPeople: [number, number];
   toursAvailable: boolean;
+  tastingPrice: number;
+  multipleTastings: boolean;
+  foodPairings: boolean;
 };
 
 export interface FilterState {
@@ -26,6 +29,9 @@ export const useFilterStore = create<FilterState>((set) => ({
     specialFeatures: [],
     numberOfPeople: [1, 20],
     toursAvailable: false,
+    tastingPrice: 200,
+    multipleTastings: false,
+    foodPairings: false,
   },
   setFilters: (newFilters) =>
     set((state) => ({

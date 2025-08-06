@@ -189,24 +189,42 @@ export default function WineryListPage() {
                 <div>
                   <h3 className="text-2xl font-semibold border-b pb-1 mb-4">Tasting Info</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <p>
-                      <span className="font-semibold">Price:</span> {selectedWinery.tasting_info.tasting_price}
-                    </p>
-                    <p>
-                      <span className="font-semibold">Available Times:</span>{" "}
-                      {selectedWinery.tasting_info.available_times.join(", ")}
-                    </p>
-                    <p>
-                      <span className="font-semibold">Wine Types:</span> {selectedWinery.tasting_info.wine_types.join(", ")}
-                    </p>
-                    <p>
-                      <span className="font-semibold">Special Features:</span>{" "}
-                      {selectedWinery.tasting_info.special_features.join(", ")}
-                    </p>
-                    <p>
-                      <span className="font-semibold">Food Available:</span>{" "}
-                      {selectedWinery.tasting_info.food_pairings_available ? "Yes" : "No"}
-                    </p>
+                    {selectedWinery.tasting_info && selectedWinery.tasting_info.length > 0 ? (
+                      selectedWinery.tasting_info.map((tasting: any, index: number) => (
+                        <div key={index} className="border rounded p-4 mb-4">
+                          <h4 className="font-semibold text-lg mb-2">Tasting {index + 1}: {tasting.tasting_title}</h4>
+                          <p>
+                            <span className="font-semibold">Price:</span> ${tasting.tasting_price}
+                          </p>
+                          <p>
+                            <span className="font-semibold">Available Times:</span>{" "}
+                            {tasting.available_times && tasting.available_times.length > 0 
+                              ? tasting.available_times.join(", ") 
+                              : "No times available"}
+                          </p>
+                          <p>
+                            <span className="font-semibold">Wine Types:</span>{" "}
+                            {tasting.wine_types && tasting.wine_types.length > 0 
+                              ? tasting.wine_types.join(", ") 
+                              : "No wine types specified"}
+                          </p>
+                          <p>
+                            <span className="font-semibold">Special Features:</span>{" "}
+                            {tasting.special_features && tasting.special_features.length > 0 
+                              ? tasting.special_features.join(", ") 
+                              : "No special features"}
+                          </p>
+                          <p>
+                            <span className="font-semibold">Food Pairings:</span>{" "}
+                            {tasting.food_pairing_options && tasting.food_pairing_options.length > 0 
+                              ? `${tasting.food_pairing_options.length} options available` 
+                              : "No food pairings"}
+                          </p>
+                        </div>
+                      ))
+                    ) : (
+                      <p>No tasting information available</p>
+                    )}
                   </div>
                 </div>
               )}

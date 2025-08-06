@@ -73,12 +73,18 @@ export default function ItineraryPage() {
 const handleConfirmBooking = async () => {
   if (!user) return setShowAuthModal(true);
 
-  const data = itinerary.map((winery) => ({
-    wineryId: winery._id,
-    dateTime: winery.bookingDetails?.selectedTime,
-    tasting: winery.bookingDetails?.tasting && winery.tasting_info?.tasting_price ? winery.tasting_info.tasting_price : null,
-    foodPairings: winery.bookingDetails?.foodPairings || [],
-  }));
+  const data = itinerary.map((winery) => {
+    const selectedTastingIndex = winery.bookingDetails?.selectedTastingIndex || 0;
+    const currentTastingInfo = winery.tasting_info?.[selectedTastingIndex];
+    
+    return {
+      wineryId: winery._id,
+      dateTime: winery.bookingDetails?.selectedTime,
+      tastingIndex: selectedTastingIndex,
+      tasting: winery.bookingDetails?.tasting && currentTastingInfo?.tasting_price ? currentTastingInfo.tasting_price : null,
+      foodPairings: winery.bookingDetails?.foodPairings || [],
+    };
+  });
 
   try {
     const requiresStripe = itinerary.some((winery) => winery.booking_info?.payment_method === "pay_stripe");
@@ -90,10 +96,12 @@ const handleConfirmBooking = async () => {
         .map((winery) => {
           let totalCost = 0;
           const items = [];
+          const selectedTastingIndex = winery.bookingDetails?.selectedTastingIndex || 0;
+          const currentTastingInfo = winery.tasting_info?.[selectedTastingIndex];
 
           // Add tasting price if selected
-          if (winery.tasting_info?.tasting_price) {
-            totalCost += winery.tasting_info.tasting_price;
+          if (currentTastingInfo?.tasting_price) {
+            totalCost += currentTastingInfo.tasting_price;
           }
 
           // Add food pairing prices
@@ -103,13 +111,13 @@ const handleConfirmBooking = async () => {
             }, 0);
           }
 
-          // Create a single line item if there’s a cost
+          // Create a single line item if there's a cost
           if (totalCost > 0) {
             items.push({
               price_data: {
                 currency: "usd",
                 product_data: {
-                  name: `${winery.name} - Booking (Tasting & Food Pairings)`,
+                  name: `${winery.name} - ${currentTastingInfo?.tasting_title || 'Booking'} (Tasting & Food Pairings)`,
                 },
                 unit_amount: Math.round(totalCost * 100), // Convert to cents
               },

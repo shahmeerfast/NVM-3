@@ -17,10 +17,12 @@ export default function ItinerarySummary({ wineries, onConfirm }: ItinerarySumma
         console.log("winery", winery);
         let wineryCost = 0;
         const bookingDetails = winery.bookingDetails;
+        const selectedTastingIndex = bookingDetails?.selectedTastingIndex || 0;
+        const currentTastingInfo = winery.tasting_info?.[selectedTastingIndex];
 
-        // Add tasting price for all wineries, regardless of selection
-        if (winery.tasting_info?.tasting_price) {
-          wineryCost += winery.tasting_info.tasting_price;
+        // Add tasting price for the selected tasting
+        if (currentTastingInfo?.tasting_price) {
+          wineryCost += currentTastingInfo.tasting_price;
         }
 
         // Add food pairing prices if selected
@@ -57,33 +59,50 @@ export default function ItinerarySummary({ wineries, onConfirm }: ItinerarySumma
           <p className="text-sm text-gray-600">No wineries selected.</p>
         ) : (
           <ul className="text-sm text-gray-600">
-            {wineries.map((winery) => (
-              <li key={winery._id || winery.name} className="mt-2">
-                <span className="font-medium">{winery.name}</span>
-                {winery.bookingDetails &&
-                (winery.bookingDetails.tasting ||
-                  winery.bookingDetails.foodPairings?.length > 0 ||
-                  winery.bookingDetails.tours?.length > 0) ? (
-                  <ul className="ml-4 list-disc">
-                    {winery.bookingDetails?.tasting && winery.tasting_info?.tasting_price && (
-                      <li>Tasting: ${winery.tasting_info.tasting_price.toFixed(2)}</li>
-                    )}
-                    {winery.bookingDetails?.foodPairings?.map((pairing) => (
-                      <li key={pairing.name}>
-                        {pairing.name}: ${pairing.price.toFixed(2)}
-                      </li>
-                    ))}
-                    {winery.bookingDetails?.tours?.map((tour) => (
-                      <li key={tour.description}>
-                        {tour.description}: ${tour.price.toFixed(2)}
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="ml-4 text-gray-500">No options selected</p>
-                )}
-              </li>
-            ))}
+            {wineries.map((winery) => {
+              const bookingDetails = winery.bookingDetails;
+              const selectedTastingIndex = bookingDetails?.selectedTastingIndex || 0;
+              const currentTastingInfo = winery.tasting_info?.[selectedTastingIndex];
+              
+              return (
+                <li key={winery._id || winery.name} className="mt-2">
+                  <span className="font-medium">{winery.name}</span>
+                  {currentTastingInfo && (
+                    <div className="ml-4 text-xs text-gray-500">
+                      {currentTastingInfo.tasting_title}
+                    </div>
+                  )}
+                  {bookingDetails &&
+                  (bookingDetails.tasting ||
+                    bookingDetails.foodPairings?.length > 0 ||
+                    bookingDetails.tours?.length > 0 ||
+                    bookingDetails.otherFeature?.length > 0) ? (
+                    <ul className="ml-4 list-disc">
+                      {currentTastingInfo?.tasting_price && (
+                        <li>Tasting: ${currentTastingInfo.tasting_price.toFixed(2)}</li>
+                      )}
+                      {bookingDetails?.foodPairings?.map((pairing) => (
+                        <li key={pairing.name}>
+                          {pairing.name}: ${pairing.price.toFixed(2)}
+                        </li>
+                      ))}
+                      {bookingDetails?.tours?.map((tour) => (
+                        <li key={tour.description}>
+                          {tour.description}: ${tour.price.toFixed(2)}
+                        </li>
+                      ))}
+                      {bookingDetails?.otherFeature?.map((feature) => (
+                        <li key={feature.description}>
+                          {feature.description}: ${feature.price.toFixed(2)}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="ml-4 text-gray-500">No options selected</p>
+                  )}
+                </li>
+              );
+            })}
           </ul>
         )}
       </div>

@@ -10,7 +10,9 @@ interface WineryCardProps {
 }
 
 export default function WineryBookingCard({ winery, onUpdate, onRemove }: WineryCardProps) {
-  const availableSlots = winery.booking_info?.available_slots || [];
+  // Get the first tasting info for backward compatibility, or use the first one from the array
+  const primaryTastingInfo = winery.tasting_info?.[0] || winery.tasting_info;
+  const availableSlots = primaryTastingInfo?.booking_info?.available_slots || winery.booking_info?.available_slots || [];
   const uniqueDatesSet = new Set(availableSlots.map((slot) => new Date(slot).toISOString().split("T")[0]));
   const availableDates = Array.from(uniqueDatesSet).sort();
   const minDate = availableDates.length > 0 ? availableDates[0] : "";
@@ -19,6 +21,7 @@ export default function WineryBookingCard({ winery, onUpdate, onRemove }: Winery
 
   const [selectedDate, setSelectedDate] = useState<string>(initialDate);
   const [selectedTime, setSelectedTime] = useState<string>("");
+  const [selectedTastingIndex, setSelectedTastingIndex] = useState<number>(0);
   const [availableTimes, setAvailableTimes] = useState<string[]>([]);
   const [selections, setSelections] = useState({
     tasting: false,
@@ -26,6 +29,9 @@ export default function WineryBookingCard({ winery, onUpdate, onRemove }: Winery
     tours: [] as { description: string; price: number }[],
     otherFeature: [] as { description: string; price: number }[],
   });
+
+  // Get current tasting info based on selection
+  const currentTastingInfo = winery.tasting_info?.[selectedTastingIndex] || primaryTastingInfo;
 
   useEffect(() => {
     if (selectedDate) {
@@ -46,12 +52,13 @@ export default function WineryBookingCard({ winery, onUpdate, onRemove }: Winery
     onUpdate(winery._id || winery.name, {
       selectedDate,
       selectedTime,
+      selectedTastingIndex,
       tasting: selections.tasting,
       foodPairings: selections.foodPairings,
       tours: selections.tours || [],
       otherFeature: selections.otherFeature || [],
     });
-  }, [selectedDate, selectedTime, selections, winery._id, winery.name, onUpdate]);
+  }, [selectedDate, selectedTime, selectedTastingIndex, selections, winery._id, winery.name, onUpdate]);
 
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const dateValue = e.target.value;
@@ -67,56 +74,58 @@ export default function WineryBookingCard({ winery, onUpdate, onRemove }: Winery
     setSelections((prev) => ({ ...prev, [key]: value }));
   };
 
-const handleFoodPairingChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-  const selectedValue = e.target.value;
+  const handleFoodPairingChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedValue = e.target.value;
 
-  if (!selectedValue) {
-    setSelections((prev) => ({ ...prev, foodPairings: [] }));
-    return;
-  }
+    if (!selectedValue) {
+      setSelections((prev) => ({ ...prev, foodPairings: [] }));
+      return;
+    }
 
-  const selectedOptions = Array.from(e.target.selectedOptions, (option) => ({
-    name: option.value,
-    price: Number(option.dataset.price) || 0,
-  }));
+    const selectedOptions = Array.from(e.target.selectedOptions, (option) => ({
+      name: option.value,
+      price: Number(option.dataset.price) || 0,
+    }));
 
-  setSelections((prev) => ({ ...prev, foodPairings: selectedOptions }));
-};
-const handleTourChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-  const selectedValue = e.target.value;
+    setSelections((prev) => ({ ...prev, foodPairings: selectedOptions }));
+  };
 
-  if (!selectedValue) {
-    setSelections((prev) => ({ ...prev, tours: [] }));
-    return;
-  }
+  const handleTourChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedValue = e.target.value;
 
-  const selectedOptions = Array.from(e.target.selectedOptions, (option) => ({
-    description: option.value,
-    price: Number(option.dataset.price) || 0,
-  }));
+    if (!selectedValue) {
+      setSelections((prev) => ({ ...prev, tours: [] }));
+      return;
+    }
 
-  setSelections((prev) => ({ ...prev, tours: selectedOptions }));
-};
-const handleChangeOther = (e: React.ChangeEvent<HTMLSelectElement>) => {
-  const selectedValue = e.target.value;
+    const selectedOptions = Array.from(e.target.selectedOptions, (option) => ({
+      description: option.value,
+      price: Number(option.dataset.price) || 0,
+    }));
 
-  if (!selectedValue) {
-    setSelections((prev) => ({ ...prev, otherFeature: [] }));
-    return;
-  }
+    setSelections((prev) => ({ ...prev, tours: selectedOptions }));
+  };
 
-  const selectedOptions = Array.from(e.target.selectedOptions, (option) => ({
-    description: option.value,
-    price: Number(option.dataset.price) || 0,
-  }));
+  const handleChangeOther = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedValue = e.target.value;
 
-  setSelections((prev) => ({ ...prev, otherFeature: selectedOptions }));
-};
+    if (!selectedValue) {
+      setSelections((prev) => ({ ...prev, otherFeature: [] }));
+      return;
+    }
+
+    const selectedOptions = Array.from(e.target.selectedOptions, (option) => ({
+      description: option.value,
+      price: Number(option.dataset.price) || 0,
+    }));
+
+    setSelections((prev) => ({ ...prev, otherFeature: selectedOptions }));
+  };
 
   useEffect(() => {
     setSelections((prev) => ({ ...prev, foodPairings: [], tours: [], otherFeature: [] }));
-  }, [winery.tasting_info]);
-console.log(winery);
+  }, [currentTastingInfo]);
+
   return (
     <div className="card shadow-sm bg-white rounded-xl p-4 md:p-6 flex flex-col md:flex-row gap-4 items-start w-full">
       <div className="flex-grow bg-white w-full">
@@ -131,13 +140,31 @@ console.log(winery);
         </div>
         <p className="text-xs text-gray-500">{winery.location?.address ?? "Address not available"}</p>
 
+        {/* Multiple Tasting Selection */}
+        {winery.tasting_info && winery.tasting_info.length > 1 && (
+          <div className="mt-2">
+            <label className="block text-xs font-medium text-gray-600">Select Tasting Experience</label>
+            <select
+              className="w-full text-sm rounded-md h-10 p-2 box-border"
+              value={selectedTastingIndex}
+              onChange={(e) => setSelectedTastingIndex(Number(e.target.value))}
+            >
+              {winery.tasting_info.map((tasting, index) => (
+                <option key={index} value={index}>
+                  {tasting.tasting_title} - ${tasting.tasting_price.toFixed(2)}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
         <div className="flex items-center justify-between text-sm text-gray-700 mt-2 gap-2">
           <span className="flex items-center gap-1">
-            💰 Tasting: ${winery.tasting_info?.tasting_price?.toFixed(2) ?? "N/A"}
+            💰 Tasting: ${currentTastingInfo?.tasting_price?.toFixed(2) ?? "N/A"}
           </span>
           <span className="flex items-center gap-1">
-            ⏰ {winery.tasting_info?.available_times?.slice(0, 3).join(", ") ?? "No times available"}
-            {winery.tasting_info?.available_times?.length > 3 && "..."}
+            ⏰ {currentTastingInfo?.available_times?.slice(0, 3).join(", ") ?? "No times available"}
+            {currentTastingInfo?.available_times?.length > 3 && "..."}
           </span>
         </div>
 
@@ -180,12 +207,12 @@ console.log(winery);
               className="select select-bordered w-full text-sm h-10"
               onChange={handleFoodPairingChange}
             >
-              {winery?.food_pairing_options?.length > 0 ? (
+              {currentTastingInfo?.food_pairing_options?.length > 0 ? (
                 <>
                   <option value="">
                     Select food available
                   </option>
-                  {winery.food_pairing_options.map((option) => (
+                  {currentTastingInfo.food_pairing_options.map((option) => (
                     <option key={option.name} value={option.name} data-price={option.price}>
                       {option.name} (${option.price.toFixed(2)})
                     </option>
@@ -198,18 +225,19 @@ console.log(winery);
               )}
             </select>
           </div>
-            <div className="w-full md:w-1/3">
+
+          <div className="w-full md:w-1/3">
             <label className="block text-xs font-medium text-gray-600">Tour</label>
             <select
               className="select select-bordered w-full text-sm h-10"
               onChange={handleTourChange}
             >
-              {winery?.tours.tour_options?.length > 0 ? (
+              {currentTastingInfo?.tours?.tour_options?.length > 0 ? (
                 <>
                   <option value="">
                     Select Tour
                   </option>
-                  {winery.tours.tour_options?.map((option) => (
+                  {currentTastingInfo.tours.tour_options?.map((option) => (
                     <option key={option.description} value={option.description} data-price={option.cost}>
                       {option.description} (${option.cost.toFixed(2)})
                     </option>
@@ -217,23 +245,24 @@ console.log(winery);
                 </>
               ) : (
                 <option value="" disabled>
-                  No pairings available
+                  No tours available
                 </option>
               )}
             </select>
           </div>
-                  <div className="w-full md:w-1/3">
+
+          <div className="w-full md:w-1/3">
             <label className="block text-xs font-medium text-gray-600">Other Features</label>
             <select
               className="select select-bordered w-full text-sm h-10"
               onChange={handleChangeOther}
             >
-              {winery?.booking_info.other_features?.length > 0 ? (
+              {currentTastingInfo?.other_features?.length > 0 ? (
                 <>
                   <option value="">
                     Select Other Feature
                   </option>
-                  {winery.booking_info.other_features?.map((option) => (
+                  {currentTastingInfo.other_features?.map((option) => (
                     <option key={option.description} value={option.description} data-price={option.cost}>
                       {option.description} (${option.cost.toFixed(2)})
                     </option>
@@ -241,7 +270,7 @@ console.log(winery);
                 </>
               ) : (
                 <option value="" disabled>
-                  No pairings available
+                  No features available
                 </option>
               )}
             </select>

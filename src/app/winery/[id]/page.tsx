@@ -27,13 +27,19 @@ import axios from "axios";
 const WineryDetail = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [userLocation, setUserLocation] = useState<GeolocationCoordinates | null>(null);
-  const [selectedTastingOption, setSelectedTastingOption] = useState<string | null>(null);
+  const [selectedTastingIndex, setSelectedTastingIndex] = useState<number>(0);
   const [selectedFoodPairingOption, setSelectedFoodPairingOption] = useState<string | null>(null);
   const [selectedNumberOfPeople, setSelectedNumberOfPeople] = useState<number>(1);
   const { id } = useParams() as { id: string };
   const { itinerary, setItinerary } = useItinerary();
   const [winery, setWinery] = useState<Winery>(undefined as any);
   const hasFetchedWinery = useRef(false);
+
+  // Get current tasting info based on selection
+  const currentTastingInfo = winery?.tasting_info?.[selectedTastingIndex];
+  
+  // Get images from the current tasting or fallback to first tasting
+  const currentImages = currentTastingInfo?.images || winery?.tasting_info?.[0]?.images || [];
 
   const addToItinerary = () => {
     if (!itinerary.includes(id as any)) {
@@ -61,9 +67,9 @@ const WineryDetail = () => {
   const changeImage = (direction: "next" | "prev") => {
     setCurrentImageIndex((prevIndex) => {
       if (direction === "next") {
-        return (prevIndex + 1) % winery?.images.length;
+        return (prevIndex + 1) % currentImages.length;
       }
-      return (prevIndex - 1 + winery?.images.length) % winery?.images.length;
+      return (prevIndex - 1 + currentImages.length) % currentImages.length;
     });
   };
 
@@ -96,7 +102,13 @@ const WineryDetail = () => {
     <div className="min-h-screen bg-wine-background md:top-20 top-16 relative">
       {/* Hero Section */}
       <div className="relative h-[80vh] overflow-hidden">
-        <img src={winery.images[currentImageIndex]} alt={winery.name} className="w-full h-full object-cover" />
+        {currentImages.length > 0 ? (
+          <img src={currentImages[currentImageIndex]} alt={winery.name} className="w-full h-full object-cover" />
+        ) : (
+          <div className="w-full h-full bg-gray-300 flex items-center justify-center">
+            <span className="text-gray-500">No images available</span>
+          </div>
+        )}
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/50 flex items-center justify-center">
           <div className="text-center text-white max-w-4xl px-4">
             <h1 className="font-serif text-6xl mb-6 leading-tight">{winery.name}</h1>
@@ -108,28 +120,56 @@ const WineryDetail = () => {
             </div>
           </div>
         </div>
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex space-x-4">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => changeImage("prev")}
-            className="bg-white/80 hover:bg-white backdrop-blur-sm"
-          >
-            <FaArrowLeft className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => changeImage("next")}
-            className="bg-white/80 hover:bg-white backdrop-blur-sm"
-          >
-            <FaArrowRight className="h-4 w-4" />
-          </Button>
-        </div>
+        {currentImages.length > 1 && (
+          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex space-x-4">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => changeImage("prev")}
+              className="bg-white/80 hover:bg-white backdrop-blur-sm"
+            >
+              <FaArrowLeft className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => changeImage("next")}
+              className="bg-white/80 hover:bg-white backdrop-blur-sm"
+            >
+              <FaArrowRight className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Content Section */}
       <div className="max-w-7xl mx-auto px-4 py-16 space-y-16">
+        {/* Multiple Tasting Selection */}
+        {winery.tasting_info && winery.tasting_info.length > 1 && (
+          <div className="bg-white rounded-xl p-8 shadow-lg">
+            <h2 className="font-serif text-3xl mb-6 text-wine-primary">Choose Your Tasting Experience</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {winery.tasting_info.map((tasting, index) => (
+                <Card 
+                  key={index} 
+                  className={`p-6 cursor-pointer transition-all duration-300 hover:shadow-lg ${
+                    selectedTastingIndex === index ? 'ring-2 ring-wine-primary bg-wine-primary/5' : ''
+                  }`}
+                  onClick={() => setSelectedTastingIndex(index)}
+                >
+                  <h3 className="font-serif text-xl mb-3 text-wine-primary">{tasting.tasting_title}</h3>
+                  <p className="text-gray-600 mb-4 text-sm">{tasting.tasting_description}</p>
+                  <div className="space-y-2 text-sm">
+                    <p className="font-semibold text-lg">${tasting.tasting_price.toFixed(2)}</p>
+                    <p className="text-gray-500">{tasting.number_of_wines_per_tasting} wines included</p>
+                    <p className="text-gray-500">{tasting.ava}</p>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Quick Info Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <Card className="p-6 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
@@ -139,7 +179,7 @@ const WineryDetail = () => {
               </div>
               <div>
                 <h3 className="font-serif text-lg mb-1">Wine Types</h3>
-                <p className="text-gray-600 text-sm capitalize">{winery?.tasting_info.wine_types.join(", ")}</p>
+                <p className="text-gray-600 text-sm capitalize">{currentTastingInfo?.wine_types?.join(", ") || "N/A"}</p>
               </div>
             </div>
           </Card>
@@ -150,7 +190,7 @@ const WineryDetail = () => {
               </div>
               <div>
                 <h3 className="font-serif text-lg mb-1">Times</h3>
-                <p className="text-gray-600 text-sm capitalize">{winery?.tasting_info.available_times.join(", ")}</p>
+                <p className="text-gray-600 text-sm capitalize">{currentTastingInfo?.available_times?.join(", ") || "N/A"}</p>
               </div>
             </div>
           </Card>
@@ -161,7 +201,7 @@ const WineryDetail = () => {
               </div>
               <div>
                 <h3 className="font-serif text-lg mb-1">Price</h3>
-                <p className="text-gray-600 text-sm">${winery.tasting_info?.tasting_price?.toFixed(2) ?? "N/A"}</p>
+                <p className="text-gray-600 text-sm">${currentTastingInfo?.tasting_price?.toFixed(2) ?? "N/A"}</p>
               </div>
             </div>
           </Card>
@@ -172,7 +212,7 @@ const WineryDetail = () => {
               </div>
               <div>
                 <h3 className="font-serif text-lg mb-1">Location</h3>
-                <p className="text-gray-600 text-sm">{winery?.ava}</p>
+                <p className="text-gray-600 text-sm">{currentTastingInfo?.ava}</p>
               </div>
             </div>
           </Card>
@@ -185,7 +225,7 @@ const WineryDetail = () => {
             {/* Wine Section */}
             <div>
               <h3 className="font-serif text-xl mb-4">Wine</h3>
-              {winery.wine_details.map((wine, index) => (
+              {currentTastingInfo?.wine_details?.map((wine, index) => (
                 <div key={wine.id} className="mb-4">
                   <p>
                     <strong>Wine Name:</strong> {wine.name}
@@ -194,13 +234,13 @@ const WineryDetail = () => {
                     <strong>Wine Description:</strong> {wine.description}
                   </p>
                 </div>
-              ))}
+              )) || <p className="text-gray-500">No wine details available</p>}
             </div>
 
             {/* Tour Options Section */}
             <div>
               <h3 className="font-serif text-xl mb-4">Tour Options</h3>
-              {winery.tours.tour_options.map((tour, index) => (
+              {currentTastingInfo?.tours?.tour_options?.map((tour, index) => (
                 <div key={index + 1} className="mb-4">
                   <p>
                     <strong>Tour Option #{index + 1}:</strong> {tour.description}
@@ -209,26 +249,13 @@ const WineryDetail = () => {
                     <strong>Tour Cost:</strong> ${tour.cost}
                   </p>
                 </div>
-              ))}
+              )) || <p className="text-gray-500">No tour options available</p>}
             </div>
-
-            {/* Tastings Section */}
-            {/* <div>
-              <h3 className="font-serif text-xl mb-4">Tastings</h3>
-              {winery?.tastings?.map((tasting, index) => (
-                <div key={tasting.id} className="mb-4">
-                  <p><strong>Tasting #{index + 1}:</strong> {tasting.name}</p>
-                  <p><strong>Description:</strong> {tasting.description}</p>
-                  <p><strong>Price per person:</strong> ${tasting.price}</p>
-                  <p><strong>Time slot:</strong> {tasting.time_slots || "N/A"}</p>
-                </div>
-              ))}
-            </div> */}
 
             {/* Additional Guests Section */}
             <div>
               <h3 className="font-serif text-xl mb-4">Other Features</h3>
-              {winery.booking_info.other_features.map((feature, index) => (
+              {currentTastingInfo?.other_features?.map((feature, index) => (
                 <div key={index + 1} className="mb-4">
                   <p>
                     <strong>Feature #{index + 1}:</strong> {feature.description}
@@ -237,13 +264,13 @@ const WineryDetail = () => {
                     <strong>Feature Cost:</strong> ${feature.cost}
                   </p>
                 </div>
-              ))}
+              )) || <p className="text-gray-500">No other features available</p>}
             </div>
 
             {/* Food Pairings Section */}
             <div>
               <h3 className="font-serif text-xl mb-4">Food Pairings</h3>
-              {winery?.food_pairing_options.map((pairing, index) => (
+              {currentTastingInfo?.food_pairing_options?.map((pairing, index) => (
                 <div key={index + 1} className="mb-4">
                   <p>
                     <strong>Food Pairing #{index + 1}:</strong> {pairing.name}
@@ -252,7 +279,7 @@ const WineryDetail = () => {
                     <strong>Price:</strong> ${pairing.price}
                   </p>
                 </div>
-              ))}
+              )) || <p className="text-gray-500">No food pairings available</p>}
             </div>
           </div>
         </div>
@@ -269,23 +296,23 @@ const WineryDetail = () => {
               <div className="space-y-4">
                 <p className="flex items-center gap-2">
                   <FaWineGlass className="text-wine-primary" />
-                  <span>{winery?.tasting_info.number_of_wines_per_tasting} wines per tasting</span>
+                  <span>{currentTastingInfo?.number_of_wines_per_tasting} wines per tasting</span>
                 </p>
                 <p className="flex items-center gap-2">
                   <FaUsers className="text-wine-primary" />
-                  <span>Group size: {winery?.booking_info.number_of_people} people</span>
+                  <span>Group size: {currentTastingInfo?.booking_info?.number_of_people?.join('-') || "N/A"} people</span>
                 </p>
                 <div>
                   <h4 className="font-medium mb-3">Special Features:</h4>
                   <div className="flex flex-wrap gap-2">
-                    {winery?.tasting_info.special_features.map((feature, index) => (
+                    {currentTastingInfo?.special_features?.map((feature, index) => (
                       <span
                         key={index}
                         className="bg-wine-primary/10 text-wine-primary px-4 py-2 rounded-full text-sm font-medium"
                       >
                         {feature}
                       </span>
-                    ))}
+                    )) || <span className="text-gray-500">No special features</span>}
                   </div>
                 </div>
               </div>
@@ -295,11 +322,11 @@ const WineryDetail = () => {
               <ul className="space-y-3 text-gray-600">
                 <li className="flex items-center gap-2">
                   <span className="w-2 h-2 bg-wine-primary rounded-full"></span>
-                  Food  {winery?.tasting_info.available_times ? "available" : "not available"}
+                  Food {currentTastingInfo?.food_pairing_options?.length ? "available" : "not available"}
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="w-2 h-2 bg-wine-primary rounded-full"></span>
-                  Located in {winery?.ava} region
+                  Located in {currentTastingInfo?.ava} region
                 </li>
               </ul>
             </div>
@@ -319,7 +346,7 @@ const WineryDetail = () => {
                 className="select select-bordered w-full mt-2 text-sm"
               >
                 <option value="">No food pairing</option>
-                {winery?.food_pairing_options.map((option) => (
+                {currentTastingInfo?.food_pairing_options?.map((option) => (
                   <option key={option.name} value={option.name} data-price={option.price}>
                     {option.name} (${option.price.toFixed(2)})
                   </option>
@@ -333,7 +360,7 @@ const WineryDetail = () => {
               <input
                 type="number"
                 min={1}
-                max={winery?.booking_info.max_guests_per_slot || 20}
+                max={currentTastingInfo?.booking_info?.max_guests_per_slot || 20}
                 value={selectedNumberOfPeople}
                 onChange={(e) => setSelectedNumberOfPeople(parseInt(e.target.value) || 1)}
                 className="input input-bordered w-full mt-2 text-sm"
@@ -341,11 +368,11 @@ const WineryDetail = () => {
             </div>
 
             {/* External Booking Link */}
-            {winery?.booking_info.external_booking_link && (
+            {currentTastingInfo?.booking_info?.external_booking_link && (
               <div>
                 <Button
                   className="bg-wine-primary hover:bg-wine-primary/90 text-white w-full py-6 text-lg"
-                  onClick={() => window.open(winery.booking_info.external_booking_link, "_blank")}
+                  onClick={() => window.open(currentTastingInfo.booking_info.external_booking_link, "_blank")}
                 >
                   Book via External Site
                 </Button>
@@ -354,9 +381,9 @@ const WineryDetail = () => {
 
             {/* Booking Calendar */}
             <BookingCalendar
-              slots={winery?.booking_info.available_slots}
-              maxGuests={winery?.booking_info.max_guests_per_slot}
-              weekendMultiplier={winery?.booking_info.dynamic_pricing.weekend_multiplier}
+              slots={currentTastingInfo?.booking_info?.available_slots}
+              maxGuests={currentTastingInfo?.booking_info?.max_guests_per_slot}
+              weekendMultiplier={currentTastingInfo?.booking_info?.dynamic_pricing?.weekend_multiplier}
             />
           </div>
         </div>
