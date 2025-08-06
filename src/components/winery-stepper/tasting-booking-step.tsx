@@ -13,6 +13,8 @@ type TastingBookingFormProps = {
   setUploadedFiles: React.Dispatch<React.SetStateAction<File[]>>;
   availableSlotDates: Date[];
   setAvailableSlotDates: React.Dispatch<React.SetStateAction<Date[]>>;
+  tastingImages: { [key: number]: File[] };
+  setTastingImages: React.Dispatch<React.SetStateAction<{ [key: number]: File[] }>>;
 };
 
 export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
@@ -22,12 +24,13 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
   setUploadedFiles,
   availableSlotDates,
   setAvailableSlotDates,
+  tastingImages,
+  setTastingImages,
 }) => {
   const [foodPairingOption, setFoodPairingOption] = useState<FoodPairingOption>({ id: "", name: "", price: 0 });
   const [newWine, setNewWine] = useState<WineDetail>({ id: "", name: "", description: "", year: undefined, tasting_notes: "", photo: "" });
   const [newTour, setNewTour] = useState<{ description: string; cost: number }>({ description: "", cost: 0 });
   const [otherFeature, setOtherFeature] = useState<{ description: string; cost: number }>({ description: "", cost: 0 });
-  const [tastingImages, setTastingImages] = useState<{ [key: number]: File[] }>({});
   const [tastingWinePhotos, setTastingWinePhotos] = useState<{ [key: number]: File[] }>({});
 
   const addTasting = (index: number) => () => {
@@ -40,7 +43,6 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
       number_of_wines_per_tasting: 1,
       special_features: [],
       images: [],
-      tasting_info: {} as TastingInfo,
       food_pairing_options: [],
       tours: { available: false, tour_price: 0, tour_options: [] },
       wine_details: [],
@@ -74,7 +76,6 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
       number_of_wines_per_tasting: 1,
       special_features: [],
       images: [],
-      tasting_info: {} as TastingInfo,
       food_pairing_options: [],
       tours: { available: false, tour_price: 0, tour_options: [] },
       wine_details: [],
@@ -294,32 +295,39 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
       [index]: files
     }));
     
-    // Get existing images from the current tasting
-    const currentTasting = formData.tasting_info[index];
-    const existingImages = currentTasting.images || [];
-    
-    // Combine existing images with new uploaded images
-    const newImageUrls = files.map((file) => URL.createObjectURL(file));
-    const allImages = [...existingImages, ...newImageUrls];
-    
-    // Update the tasting images in formData
-    handleTastingChange(index, "images", allImages);
+    // Don't create blob URLs here - we'll upload to ImgBB later
+    // Just store the files for now
   };
 
   // Function to get current images for a tasting (either from uploaded files or existing images)
   const getTastingImages = (index: number) => {
-    const currentTasting = formData.tasting_info[index];
     const uploadedFiles = tastingImages[index] || [];
-    
-    // If we have uploaded files, use those
-    if (uploadedFiles.length > 0) {
-      return uploadedFiles;
-    }
-    
-    // Otherwise, return empty array (existing images are already in formData)
-    return [];
+    return uploadedFiles;
   };
 
+  const removeTastingImage = (tastingIndex: number, imageIndex: number) => {
+    setFormData((prev) => {
+      const updatedTastings = [...prev.tasting_info];
+      const currentImages = [...updatedTastings[tastingIndex].images];
+      currentImages.splice(imageIndex, 1);
+      updatedTastings[tastingIndex] = {
+        ...updatedTastings[tastingIndex],
+        images: currentImages
+      };
+      return { ...prev, tasting_info: updatedTastings };
+    });
+  };
+
+  const removeNewTastingImage = (tastingIndex: number, fileIndex: number) => {
+    setTastingImages(prev => {
+      const currentFiles = [...(prev[tastingIndex] || [])];
+      currentFiles.splice(fileIndex, 1);
+      return {
+        ...prev,
+        [tastingIndex]: currentFiles
+      };
+    });
+  };
 
   const removeWinePhoto = (tastingIndex: number, wineIndex: number) => {
     setFormData((prev) => {
@@ -473,7 +481,7 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
           <select
             className="select select-bordered"
             value={tasting.ava || ""}
-            onChange={handleSelectChange(index, "ava")}
+            onChange={e => handleTastingChange(index, "ava", e.target.value)}
           >
             <option value="">Select AVA</option>
             {regions.map((ava) => (

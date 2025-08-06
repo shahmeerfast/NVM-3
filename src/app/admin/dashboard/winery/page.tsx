@@ -51,12 +51,13 @@ const initialState: Winery = {
 };
 
 export default function WineryAdminStepperPage() {
+  const [formData, setFormData] = useState<Winery>(initialState);
   const [activeStep, setActiveStep] = useState(0);
-  const [formData, setFormData] = useState<Winery>({ ...initialState });
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [availableSlotDates, setAvailableSlotDates] = useState<Date[]>([]);
   const [loading, setLoading] = useState(false);
-  const formRef = useRef<HTMLFormElement | null>(null);
+  const [tastingImages, setTastingImages] = useState<{ [key: number]: File[] }>({});
+  const formRef = useRef<HTMLFormElement>(null);
   const router = useRouter();
   const searchParams = useSearchParams();
   const wineryId = searchParams.get("id");
@@ -82,17 +83,39 @@ export default function WineryAdminStepperPage() {
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      // Upload files and distribute URLs across tastings
-      const filesUrls = await fileUpload(uploadedFiles);
+      // Collect all files from global uploads and individual tastings
+      const allFiles: File[] = [...uploadedFiles];
+      
+      // Add files from individual tastings
+      Object.values(tastingImages).forEach(files => {
+        allFiles.push(...files);
+      });
+      
+      // Upload all files to ImgBB
+      const filesUrls = await fileUpload(allFiles);
+      
       const updatedFormData = { ...formData };
+      
       if (filesUrls.length > 0) {
-        updatedFormData.tasting_info = updatedFormData.tasting_info.map((tasting, index) => ({
-          ...tasting,
-          images: filesUrls.slice(
-            index * Math.ceil(filesUrls.length / updatedFormData.tasting_info.length),
-            (index + 1) * Math.ceil(filesUrls.length / updatedFormData.tasting_info.length)
-          ),
-        }));
+        // Distribute URLs properly to each tasting
+        let urlIndex = 0;
+        updatedFormData.tasting_info = updatedFormData.tasting_info.map((tasting, index) => {
+          const filesForThisTasting = tastingImages[index] || [];
+          const urlsForThisTasting: string[] = [];
+          
+          // Get URLs for this tasting's files
+          for (let i = 0; i < filesForThisTasting.length && urlIndex < filesUrls.length; i++) {
+            urlsForThisTasting.push(filesUrls[urlIndex]);
+            urlIndex++;
+          }
+          
+          // Combine with existing images
+          const existingImages = tasting.images || [];
+          return {
+            ...tasting,
+            images: [...existingImages, ...urlsForThisTasting]
+          };
+        });
       }
 
       if (wineryId) {
@@ -114,10 +137,12 @@ export default function WineryAdminStepperPage() {
       }
       setFormData({ ...initialState });
       setUploadedFiles([]);
+      setTastingImages({});
       setAvailableSlotDates([]);
       setActiveStep(0);
       router.push("/admin/dashboard/winery/list");
     } catch (error) {
+      console.error("Error saving winery:", error);
       toast.error("Error saving winery. Please try again.", {
         position: "top-right",
         autoClose: 3000,
@@ -141,6 +166,8 @@ export default function WineryAdminStepperPage() {
             setUploadedFiles={setUploadedFiles}
             availableSlotDates={availableSlotDates}
             setAvailableSlotDates={setAvailableSlotDates}
+            tastingImages={tastingImages}
+            setTastingImages={setTastingImages}
           />
         );
       default:

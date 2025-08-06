@@ -51,7 +51,6 @@ export interface BookingInfo {
   dynamic_pricing: DynamicPricing;
   available_slots: string[];
   external_booking_link?: string;
-  other_features: { description: string; cost: number; feature_id?: string }[];
 }
 
 // Amenities.ts
