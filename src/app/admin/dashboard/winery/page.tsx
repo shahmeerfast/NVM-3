@@ -24,7 +24,6 @@ const initialState: Winery = {
       number_of_wines_per_tasting: 1,
       special_features: [],
       images: [],
-      tasting_info: {} as any, // Placeholder, as per interface
       food_pairing_options: [],
       ava: "",
       tours: {
