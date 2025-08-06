@@ -1,9 +1,10 @@
 import { FC } from "react";
 import { wineTypes, regions, specialFeatures, timeOptions } from "@/data/data";
 
+
 interface FilterProps {
   filters: any;
-  handleFilterChange: (e: React.ChangeEvent<any>) => void;
+  handleFilterChange: (event: { target: { name: string; value: any } }) => void;
   handleMultiSelect: (filterType: string, value: string) => void;
   resetFilters: () => void;
   toggleDropdown: () => void;
@@ -46,7 +47,7 @@ const FilterComponent: FC<FilterProps> = ({
               min="0"
               max="200"
               value={filters.tastingPrice || 200}
-              onChange={handleFilterChange}
+              onChange={(e) => handleFilterChange({ target: { name: e.target.name, value: Number(e.target.value) } })}
               className="range range-primary w-full"
               aria-label="Select tasting price range"
             />
@@ -64,16 +65,17 @@ const FilterComponent: FC<FilterProps> = ({
           <div className="relative">
             <input
               type="range"
+              name="price"
               min="0"
               max="200"
               value={filters.price}
-              onChange={handleFilterChange}
+              onChange={(e) => handleFilterChange({ target: { name: e.target.name, value: Number(e.target.value) } })}
               className="range range-primary w-full"
               aria-label="Select price range"
             />
             <div className="absolute flex justify-between w-full mt-2 text-sm text-neutral">
               <span>$0</span>
-              <span>{filters.price}</span>
+              <span>${filters.price}</span>
               <span>$200+</span>
             </div>
           </div>
@@ -171,7 +173,7 @@ const FilterComponent: FC<FilterProps> = ({
             min="1"
             max="10"
             value={filters.numberOfWines}
-            onChange={handleFilterChange}
+            onChange={(e) => handleFilterChange({ target: { name: e.target.name, value: Number(e.target.value) } })}
             className="range range-primary w-full"
             aria-label="Select number of wines"
           />
@@ -237,7 +239,7 @@ const FilterComponent: FC<FilterProps> = ({
                   name="time"
                   value={time}
                   checked={filters.time === time}
-                  onChange={handleFilterChange}
+                  onChange={(e) => handleFilterChange({ target: { name: e.target.name, value: e.target.value } })}
                   className="radio radio-primary"
                   aria-label={`Select tasting time: ${time}`}
                 />

@@ -12,7 +12,7 @@ interface WineryCardProps {
 export default function WineryBookingCard({ winery, onUpdate, onRemove }: WineryCardProps) {
   // Get the first tasting info for backward compatibility, or use the first one from the array
   const primaryTastingInfo = winery.tasting_info?.[0] || winery.tasting_info;
-  const availableSlots = primaryTastingInfo?.booking_info?.available_slots || winery.booking_info?.available_slots || [];
+  const availableSlots = primaryTastingInfo?.booking_info?.available_slots || primaryTastingInfo.booking_info?.available_slots || [];
   const uniqueDatesSet = new Set(availableSlots.map((slot) => new Date(slot).toISOString().split("T")[0]));
   const availableDates = Array.from(uniqueDatesSet).sort();
   const minDate = availableDates.length > 0 ? availableDates[0] : "";

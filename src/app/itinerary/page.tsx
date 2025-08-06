@@ -87,12 +87,12 @@ const handleConfirmBooking = async () => {
   });
 
   try {
-    const requiresStripe = itinerary.some((winery) => winery.booking_info?.payment_method === "pay_stripe");
+    const requiresStripe = itinerary.some((winery) => winery?.payment_method === "pay_stripe");
 
     if (requiresStripe) {
       setLoadingPayment(true);
       const lineItems = itinerary
-        .filter((winery) => winery.booking_info?.payment_method === "pay_stripe")
+        .filter((winery) => winery?.payment_method === "pay_stripe")
         .map((winery) => {
           let totalCost = 0;
           const items = [];
