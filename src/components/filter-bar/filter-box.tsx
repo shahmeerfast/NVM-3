@@ -77,7 +77,6 @@ const Filter = ({ wineries, onFilterApply }: FilterProps) => {
         });
       });
     });
-
     // Filter by wine type
     if (Object.values(filters.wineType).some((value) => value)) {
       filtered = filtered.filter((winery) => {
