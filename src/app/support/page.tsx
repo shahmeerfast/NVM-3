@@ -121,8 +121,17 @@ const SupportPage = () => {
         <div className="mb-6">
           <h3 className="font-semibold text-lg text-primary mb-2">Phone Support 📞</h3>
           <p className="text-gray-600 text-sm md:text-base">
-            Call us at <span className="font-bold text-primary">+1 (707) 555-1234</span>. Available Monday–Friday, 10 AM–5 PM
-            (PST).
+            Call us at{" "}
+            <a
+              href="https://wa.me/19544222894"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-bold text-primary underline hover:text-secondary transition"
+              title="Chat with us on WhatsApp"
+            >
+              +1 (954) 422-2894
+            </a>
+            . Available Monday–Friday, 10 AM–5 PM (PST).
           </p>
         </div>
 
@@ -205,7 +214,7 @@ const SupportPage = () => {
           </form>
         </div>
         {/* Video Section */}
-        <div className="mt-10 w-full">
+        {/* <div className="mt-10 w-full">
           <h3 className="text-xl lg:text-2xl font-bold text-primary mb-4">How to Book a Winery Visit</h3>
           <div className="relative w-full">
             <iframe
@@ -216,7 +225,7 @@ const SupportPage = () => {
               allowFullScreen={true}
             ></iframe>
           </div>
-        </div>
+        </div> */}
       </div>
 
       {/* Testimonials Section */}
@@ -227,7 +236,7 @@ const SupportPage = () => {
             "Booking my itinerary through this website made my Napa Valley experience unforgettable! The support was amazing when
             I had questions about tasting fees."
           </p>
-          <p className="font-semibold text-primary">- Jane D., New York</p>
+          <p className="font-semibold text-primary">-Johan Surich., New York</p>
         </div>
       </div>
     </div>

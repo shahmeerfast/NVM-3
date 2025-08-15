@@ -12,14 +12,7 @@ interface WineryCardProps {
 export default function WineryBookingCard({ winery, onUpdate, onRemove }: WineryCardProps) {
   // Get the first tasting info for backward compatibility, or use the first one from the array
   const primaryTastingInfo = winery.tasting_info?.[0] || winery.tasting_info;
-  const availableSlots = primaryTastingInfo?.booking_info?.available_slots || primaryTastingInfo.booking_info?.available_slots || [];
-  const uniqueDatesSet = new Set(availableSlots.map((slot) => new Date(slot).toISOString().split("T")[0]));
-  const availableDates = Array.from(uniqueDatesSet).sort();
-  const minDate = availableDates.length > 0 ? availableDates[0] : "";
-  const maxDate = availableDates.length > 0 ? availableDates[availableDates.length - 1] : "";
-  const initialDate = availableDates.length > 0 ? availableDates[0] : "";
-
-  const [selectedDate, setSelectedDate] = useState<string>(initialDate);
+  const [selectedDate, setSelectedDate] = useState<string>("");
   const [selectedTime, setSelectedTime] = useState<string>("");
   const [selectedTastingIndex, setSelectedTastingIndex] = useState<number>(0);
   const [availableTimes, setAvailableTimes] = useState<string[]>([]);
@@ -32,6 +25,21 @@ export default function WineryBookingCard({ winery, onUpdate, onRemove }: Winery
 
   // Get current tasting info based on selection
   const currentTastingInfo = winery.tasting_info?.[selectedTastingIndex] || primaryTastingInfo;
+  
+  // Get available slots from the currently selected tasting
+  const availableSlots = currentTastingInfo?.booking_info?.available_slots || [];
+  const uniqueDatesSet = new Set(availableSlots.map((slot) => new Date(slot).toISOString().split("T")[0]));
+  const availableDates = Array.from(uniqueDatesSet).sort();
+  const minDate = availableDates.length > 0 ? availableDates[0] : "";
+  const maxDate = availableDates.length > 0 ? availableDates[availableDates.length - 1] : "";
+  const initialDate = availableDates.length > 0 ? availableDates[0] : "";
+
+  // Update selected date when available dates change
+  useEffect(() => {
+    if (availableDates.length > 0 && !availableDates.includes(selectedDate)) {
+      setSelectedDate(initialDate);
+    }
+  }, [availableDates, selectedDate, initialDate]);
 
   useEffect(() => {
     if (selectedDate) {
@@ -46,7 +54,7 @@ export default function WineryBookingCard({ winery, onUpdate, onRemove }: Winery
       setAvailableTimes([]);
       setSelectedTime("");
     }
-  }, [selectedDate, availableSlots]);
+  }, [selectedDate, availableSlots, selectedTime]);
 
   useEffect(() => {
     onUpdate(winery._id || winery.name, {
@@ -147,7 +155,13 @@ export default function WineryBookingCard({ winery, onUpdate, onRemove }: Winery
             <select
               className="w-full text-sm rounded-md h-10 p-2 box-border"
               value={selectedTastingIndex}
-              onChange={(e) => setSelectedTastingIndex(Number(e.target.value))}
+              onChange={(e) => {
+                const newIndex = Number(e.target.value);
+                setSelectedTastingIndex(newIndex);
+                // Reset date and time when tasting changes
+                setSelectedDate("");
+                setSelectedTime("");
+              }}
             >
               {winery.tasting_info.map((tasting, index) => (
                 <option key={index} value={index}>
