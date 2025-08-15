@@ -9,6 +9,7 @@ type Filters = {
   numberOfWines: [number, number];
   wineType: {
     red: boolean;
+    rosé: boolean;
     white: boolean;
     sparkling: boolean;
     dessert: boolean;
@@ -41,7 +42,7 @@ export const FilterBlock = ({
   return (
     <>
       {/* Tasting Price Range Filter */}
-      <div className="grid gap-4 mt-8 mb-5">
+      {/* <div className="grid gap-4 mt-8 mb-5">
         <label className="text-sm text-gray-900 font-extrabold">Tasting Price Range</label>
         <Range
           step={10}
@@ -65,11 +66,11 @@ export const FilterBlock = ({
           <span>$0</span>
           <span>${filters.tastingPrice}</span>
         </div>
-      </div>
+      </div> */}
 
       {/* Total Price Range Filter */}
       <div className="grid gap-4 mt-8 mb-5">
-        <label className="text-sm text-gray-900 font-extrabold">Total Price Range</label>
+        <label className="text-sm text-gray-900 font-extrabold">Tasting Price Range</label>
         <Range
           step={10}
           min={0}
@@ -94,9 +95,9 @@ export const FilterBlock = ({
         </div>
       </div>
 
-      {/* Number of Wines Filter */}
+      {/* Number of Wines per Tasting Filter */}
       <div className="grid gap-4">
-        <label className="text-sm text-gray-900 font-extrabold">Number of Wines</label>
+        <label className="text-sm text-gray-900 font-extrabold">Number of Wines per Tasting</label>
         <Range
           step={1}
           min={1}
@@ -116,14 +117,14 @@ export const FilterBlock = ({
           }}
         />
         <div className="flex justify-between text-xs">
-          <span>{filters.numberOfWines[0]}</span>
-          <span>{filters.numberOfWines[1]}</span>
+          <span>{filters.numberOfWines[0]} wines</span>
+          <span>{filters.numberOfWines[1]} wines</span>
         </div>
       </div>
 
-      {/* Number of People Filter */}
+      {/* Number of People per Tasting Filter */}
       <div className="grid gap-4 mt-4">
-        <label className="text-sm text-gray-900 font-extrabold">Number of People</label>
+        <label className="text-sm text-gray-900 font-extrabold">Number of People per Tasting</label>
         <Range
           step={1}
           min={1}
@@ -143,14 +144,14 @@ export const FilterBlock = ({
           }}
         />
         <div className="flex justify-between text-xs">
-          <span>{filters.numberOfPeople[0]}</span>
-          <span>{filters.numberOfPeople[1]}</span>
+          <span>{filters.numberOfPeople[0]} people</span>
+          <span>{filters.numberOfPeople[1]} people</span>
         </div>
       </div>
 
-      {/* Wine Type Filter */}
+      {/* Wine Types of Tasting Filter */}
       <div className="mt-4">
-        <label className="text-sm text-gray-900 font-extrabold">Wine Type</label>
+        <label className="text-sm text-gray-900 font-extrabold">Wine Types of Tasting</label>
         <div className="mt-2 flex flex-wrap gap-3">
           {wineTypes.map((type) => (
             <label key={type} className="flex items-center space-x-2 text-xs sm:text-sm">

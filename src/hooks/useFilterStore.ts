@@ -3,7 +3,7 @@ import { create } from "zustand";
 export type Filters = {
   priceRange: [number, number];
   numberOfWines: [number, number];
-  wineType: { red: boolean; white: boolean; sparkling: boolean; dessert: boolean };
+  wineType: { red: boolean; rosé: boolean; white: boolean; sparkling: boolean; dessert: boolean };
   ava: string[];
   time: string;
   specialFeatures: string[];
@@ -23,7 +23,7 @@ export const useFilterStore = create<FilterState>((set) => ({
   filters: {
     priceRange: [0, 1000],
     numberOfWines: [1, 10],
-    wineType: { red: false, white: false, sparkling: false, dessert: false },
+    wineType: { red: false, rosé: false, white: false, sparkling: false, dessert: false },
     ava: [],
     time: "",
     specialFeatures: [],

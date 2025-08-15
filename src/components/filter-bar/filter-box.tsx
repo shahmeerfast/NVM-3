@@ -22,6 +22,8 @@ const Filter = ({ wineries, onFilterApply }: FilterProps) => {
     setIsLoading(true);
     let filtered = wineries;
 
+    console.log('Applying filters:', filters);
+
     // Filter by tasting price range
     filtered = filtered.filter((winery) => {
       if (!winery.tasting_info || winery.tasting_info.length === 0) return false;
@@ -50,10 +52,10 @@ const Filter = ({ wineries, onFilterApply }: FilterProps) => {
       if (!winery.tasting_info || winery.tasting_info.length === 0) return false;
       
       // Check if any tasting has the required number of wines
-      return winery.tasting_info.some(tasting =>
-        tasting.number_of_wines_per_tasting >= filters.numberOfWines[0] &&
-        tasting.number_of_wines_per_tasting <= filters.numberOfWines[1]
-      );
+      return winery.tasting_info.some(tasting => {
+        const numWines = tasting.number_of_wines_per_tasting || 1;
+        return numWines >= filters.numberOfWines[0] && numWines <= filters.numberOfWines[1];
+      });
     });
 
     // Filter by number of people
@@ -62,10 +64,14 @@ const Filter = ({ wineries, onFilterApply }: FilterProps) => {
       
       // Check if any tasting has the required number of people
       return winery.tasting_info.some(tasting => {
-        if (!tasting.booking_info?.number_of_people) return false;
-        return tasting.booking_info.number_of_people.some(people =>
-          people >= filters.numberOfPeople[0] && people <= filters.numberOfPeople[1]
-        );
+        if (!tasting.booking_info?.number_of_people || !Array.isArray(tasting.booking_info.number_of_people)) {
+          return false;
+        }
+        
+        return tasting.booking_info.number_of_people.some(people => {
+          const numPeople = people || 1;
+          return numPeople >= filters.numberOfPeople[0] && numPeople <= filters.numberOfPeople[1];
+        });
       });
     });
 
@@ -78,10 +84,19 @@ const Filter = ({ wineries, onFilterApply }: FilterProps) => {
         return winery.tasting_info.some(tasting => {
           if (!tasting.wine_types || !Array.isArray(tasting.wine_types)) return false;
           
-          return Object.keys(filters.wineType).some(
-            (type) =>
-              filters.wineType[type as keyof typeof filters.wineType] &&
-              tasting.wine_types.some((wineType) => wineType.toLowerCase() === type.toLowerCase())
+          // Get selected wine types
+          const selectedTypes = Object.keys(filters.wineType).filter(
+            (type) => filters.wineType[type as keyof typeof filters.wineType]
+          );
+          
+          // Check if any of the selected types match the tasting's wine types
+          return selectedTypes.some(selectedType => 
+            tasting.wine_types.some(wineType => {
+              // Normalize both strings for comparison
+              const normalizedSelected = selectedType.toLowerCase().trim();
+              const normalizedWineType = wineType.toLowerCase().trim();
+              return normalizedSelected === normalizedWineType;
+            })
           );
         });
       });
@@ -158,6 +173,7 @@ const Filter = ({ wineries, onFilterApply }: FilterProps) => {
       });
     }
 
+    console.log('Filtered results:', filtered.length, 'wineries');
     onFilterApply(filtered);
     setIsLoading(false);
   }, [filters, wineries, onFilterApply]);
@@ -184,7 +200,7 @@ const Filter = ({ wineries, onFilterApply }: FilterProps) => {
     setFilters({
       priceRange: [0, 1000],
       numberOfWines: [1, 10],
-      wineType: { red: false, white: false, sparkling: false, dessert: false },
+      wineType: { red: false, rosé: false, white: false, sparkling: false, dessert: false },
       ava: [],
       time: "",
       specialFeatures: [],
