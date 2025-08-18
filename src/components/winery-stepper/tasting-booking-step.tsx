@@ -32,6 +32,11 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
   const [newTour, setNewTour] = useState<{ description: string; cost: number }>({ description: "", cost: 0 });
   const [otherFeature, setOtherFeature] = useState<{ description: string; cost: number }>({ description: "", cost: 0 });
   const [tastingWinePhotos, setTastingWinePhotos] = useState<{ [key: number]: File[] }>({});
+  
+  // Local state for input values to allow empty inputs
+  const [inputValues, setInputValues] = useState<{
+    [key: string]: string;
+  }>({});
 
   const addTasting = (index: number) => () => {
     const newTasting: TastingInfo = {
@@ -64,6 +69,16 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
     });
     setUploadedFiles([]);
     setAvailableSlotDates([]);
+    
+    // Clear input values for the new tasting
+    setInputValues(prev => {
+      const newInputValues = { ...prev };
+      const newIndex = index + 1;
+      delete newInputValues[`wines_${newIndex}`];
+      delete newInputValues[`people_${newIndex}_0`];
+      delete newInputValues[`people_${newIndex}_1`];
+      return newInputValues;
+    });
   };
 
   const addInitialTasting = () => {
@@ -96,6 +111,15 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
     }));
     setUploadedFiles([]);
     setAvailableSlotDates([]);
+    
+    // Clear input values for the new tasting
+    setInputValues(prev => {
+      const newInputValues = { ...prev };
+      delete newInputValues[`wines_0`];
+      delete newInputValues[`people_0_0`];
+      delete newInputValues[`people_0_1`];
+      return newInputValues;
+    });
   };
 
   const removeTasting = (index: number) => {
@@ -103,6 +127,15 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
       ...prev,
       tasting_info: prev.tasting_info.filter((_, i) => i !== index),
     }));
+    
+    // Clear input values for the removed tasting
+    setInputValues(prev => {
+      const newInputValues = { ...prev };
+      delete newInputValues[`wines_${index}`];
+      delete newInputValues[`people_${index}_0`];
+      delete newInputValues[`people_${index}_1`];
+      return newInputValues;
+    });
   };
 
   const handleTastingChange = (index: number, field: keyof TastingInfo, value: any) => {
@@ -271,16 +304,61 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
   };
 
   const handleNumberOfWinesChange = (index: number) => (e: ChangeEvent<HTMLInputElement>) => {
-    const value = parseInt(e.target.value) || 1;
+    const inputValue = e.target.value;
+    const key = `wines_${index}`;
+    
+    // Update local input state
+    setInputValues(prev => ({
+      ...prev,
+      [key]: inputValue
+    }));
+    
+    if (inputValue === "") {
+      return;
+    }
+    
+    const parsedValue = parseInt(inputValue);
+    if (isNaN(parsedValue)) {
+      return;
+    }
+    
+    const value = Math.max(1, parsedValue);
     handleTastingChange(index, "number_of_wines_per_tasting", value);
   };
 
   const handleNumberOfPeopleChange = (index: number, position: 0 | 1) => (e: ChangeEvent<HTMLInputElement>) => {
-    const value = parseInt(e.target.value) || 1;
+    const inputValue = e.target.value;
+    const key = `people_${index}_${position}`;
+    
+    // Update local input state
+    setInputValues(prev => ({
+      ...prev,
+      [key]: inputValue
+    }));
+    
+    if (inputValue === "") {
+      return;
+    }
+    
+    const parsedValue = parseInt(inputValue);
+    if (isNaN(parsedValue)) {
+      return;
+    }
+    
+    const value = Math.max(1, parsedValue);
+    
     setFormData((prev) => {
       const updatedTastings = [...prev.tasting_info];
       const newNumberOfPeople = [...updatedTastings[index].booking_info.number_of_people];
       newNumberOfPeople[position] = value;
+      
+      // Ensure max is greater than min
+      if (position === 0 && newNumberOfPeople[1] <= value) {
+        newNumberOfPeople[1] = value + 1;
+      } else if (position === 1 && newNumberOfPeople[0] >= value) {
+        newNumberOfPeople[0] = Math.max(1, value - 1);
+      }
+      
       updatedTastings[index] = {
         ...updatedTastings[index],
         booking_info: { ...updatedTastings[index].booking_info, number_of_people: newNumberOfPeople as [number, number] },
@@ -391,9 +469,15 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
                   type="number"
                   placeholder="Enter min number"
                   className="input input-bordered"
-                  value={tasting.booking_info.number_of_people[0] || ""}
+                  value={inputValues[`people_${index}_0`] !== undefined ? inputValues[`people_${index}_0`] : (tasting.booking_info.number_of_people[0] || "")}
                   onChange={handleNumberOfPeopleChange(index, 0)}
+                  min={1}
                 />
+                {tasting.booking_info.number_of_people[0] >= tasting.booking_info.number_of_people[1] && (
+                  <label className="label">
+                    <span className="label-text-alt text-error">Min must be less than max</span>
+                  </label>
+                )}
               </div>
               <div className="form-control">
                 <label className="label">Number of People Max</label>
@@ -401,9 +485,15 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
                   type="number"
                   placeholder="Enter max number"
                   className="input input-bordered"
-                  value={tasting.booking_info.number_of_people[1] || ""}
+                  value={inputValues[`people_${index}_1`] !== undefined ? inputValues[`people_${index}_1`] : (tasting.booking_info.number_of_people[1] || "")}
                   onChange={handleNumberOfPeopleChange(index, 1)}
+                  min={tasting.booking_info.number_of_people[0] + 1}
                 />
+                {tasting.booking_info.number_of_people[1] <= tasting.booking_info.number_of_people[0] && (
+                  <label className="label">
+                    <span className="label-text-alt text-error">Max must be greater than min</span>
+                  </label>
+                )}
               </div>
             </div>
 
@@ -458,7 +548,7 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
                 type="number"
                 placeholder="Enter number of wines"
                 className="input input-bordered"
-                value={tasting.number_of_wines_per_tasting || ""}
+                value={inputValues[`wines_${index}`] !== undefined ? inputValues[`wines_${index}`] : (tasting.number_of_wines_per_tasting || "")}
                 onChange={handleNumberOfWinesChange(index)}
                 min={1}
               />
