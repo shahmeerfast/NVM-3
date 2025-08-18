@@ -18,10 +18,6 @@ type Filters = {
   time: string;
   specialFeatures: string[];
   numberOfPeople: [number, number];
-  toursAvailable: boolean;
-  tastingPrice: number;
-  multipleTastings: boolean;
-  foodPairings: boolean;
 };
 
 interface FilterBlockProps {
@@ -41,33 +37,6 @@ export const FilterBlock = ({
 }: FilterBlockProps) => {
   return (
     <>
-      {/* Tasting Price Range Filter */}
-      {/* <div className="grid gap-4 mt-8 mb-5">
-        <label className="text-sm text-gray-900 font-extrabold">Tasting Price Range</label>
-        <Range
-          step={10}
-          min={0}
-          max={200}
-          values={[filters.tastingPrice]}
-          onChange={(newValues: any) => handleFilterChange("tastingPrice", newValues[0])}
-          renderTrack={({ props, children }) => (
-            <div {...props} className="w-full h-1 bg-neutral-300 rounded-full">
-              {React.Children.map(children, (child, index) =>
-                React.isValidElement(child) ? React.cloneElement(child, { key: index }) : child
-              )}
-            </div>
-          )}
-          renderThumb={({ props }) => {
-            const { key, ...newProps } = props;
-            return <div key={key} {...newProps} className="w-4 h-4 bg-primary rounded-full shadow-lg focus:outline-none" />;
-          }}
-        />
-        <div className="flex justify-between text-xs">
-          <span>$0</span>
-          <span>${filters.tastingPrice}</span>
-        </div>
-      </div> */}
-
       {/* Total Price Range Filter */}
       <div className="grid gap-4 mt-8 mb-5">
         <label className="text-sm text-gray-900 font-extrabold">Tasting Price Range</label>
@@ -206,39 +175,6 @@ export const FilterBlock = ({
         </select>
       </div>
 
-      {/* Tasting Experience Filter */}
-      <div className="mt-4">
-        <label className="text-sm text-gray-900 font-extrabold">Tasting Experience</label>
-        <div className="mt-2 space-y-2">
-          <label className="flex items-center space-x-2 text-xs sm:text-sm">
-            <input
-              type="checkbox"
-              className="checkbox checkbox-primary"
-              checked={filters.multipleTastings}
-              onChange={(e) => handleFilterChange("multipleTastings", e.target.checked)}
-            />
-            <span>Multiple Tasting Options</span>
-          </label>
-          <label className="flex items-center space-x-2 text-xs sm:text-sm">
-            <input
-              type="checkbox"
-              className="checkbox checkbox-primary"
-              checked={filters.foodPairings}
-              onChange={(e) => handleFilterChange("foodPairings", e.target.checked)}
-            />
-            <span>Food Pairings Available</span>
-          </label>
-          <label className="flex items-center space-x-2 text-xs sm:text-sm">
-            <input
-              type="checkbox"
-              className="checkbox checkbox-primary"
-              checked={filters.toursAvailable}
-              onChange={(e) => handleFilterChange("toursAvailable", e.target.checked)}
-            />
-            <span>Tours Available</span>
-          </label>
-        </div>
-      </div>
 
       {/* Special Features Filter */}
       <div className="my-10">
