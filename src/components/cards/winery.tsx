@@ -215,14 +215,14 @@ export default function WineryBookingCard({ winery, onUpdate, onRemove }: Winery
             </select>
           </div>
 
+          {currentTastingInfo?.food_pairing_options?.length > 0 && (
+
           <div className="w-full md:w-1/3">
             <label className="block text-xs font-medium text-gray-600">Food Available</label>
             <select
               className="select select-bordered w-full text-sm h-10"
               onChange={handleFoodPairingChange}
             >
-              {currentTastingInfo?.food_pairing_options?.length > 0 ? (
-                <>
                   <option value="">
                     Select food available
                   </option>
@@ -231,14 +231,12 @@ export default function WineryBookingCard({ winery, onUpdate, onRemove }: Winery
                       {option.name} (${option.price.toFixed(2)})
                     </option>
                   ))}
-                </>
-              ) : (
-                <option value="" disabled>
-                  No pairings available
-                </option>
-              )}
+            
             </select>
           </div>
+            )}
+
+          {currentTastingInfo?.tours?.tour_options?.length >  0 &&  (
 
           <div className="w-full md:w-1/3">
             <label className="block text-xs font-medium text-gray-600">Tour</label>
@@ -246,8 +244,7 @@ export default function WineryBookingCard({ winery, onUpdate, onRemove }: Winery
               className="select select-bordered w-full text-sm h-10"
               onChange={handleTourChange}
             >
-              {currentTastingInfo?.tours?.tour_options?.length > 0 ? (
-                <>
+   
                   <option value="">
                     Select Tour
                   </option>
@@ -256,23 +253,19 @@ export default function WineryBookingCard({ winery, onUpdate, onRemove }: Winery
                       {option.description} (${option.cost.toFixed(2)})
                     </option>
                   ))}
-                </>
-              ) : (
-                <option value="" disabled>
-                  No tours available
-                </option>
-              )}
+               
             </select>
           </div>
+            )}
 
+
+          {currentTastingInfo?.other_features?.length > 0 && (
           <div className="w-full md:w-1/3">
             <label className="block text-xs font-medium text-gray-600">Other Features</label>
             <select
               className="select select-bordered w-full text-sm h-10"
               onChange={handleChangeOther}
             >
-              {currentTastingInfo?.other_features?.length > 0 ? (
-                <>
                   <option value="">
                     Select Other Feature
                   </option>
@@ -281,14 +274,10 @@ export default function WineryBookingCard({ winery, onUpdate, onRemove }: Winery
                       {option.description} (${option.cost.toFixed(2)})
                     </option>
                   ))}
-                </>
-              ) : (
-                <option value="" disabled>
-                  No features available
-                </option>
-              )}
             </select>
           </div>
+           )}
+
         </div>
       </div>
     </div>
