@@ -76,10 +76,113 @@ export default function WineryAdminStepperPage() {
     }
   }, [wineryId]);
 
-  const handleNext = () => setActiveStep((prev) => prev + 1);
+  const validateBasicInfo = () => {
+    const { name, description, contact_info, location } = formData;
+    
+    if (!name || name.trim() === "") {
+      toast.error("Winery name is required");
+      return false;
+    }
+    
+    if (!description || description.trim() === "") {
+      toast.error("Description is required");
+      return false;
+    }
+    
+    if (!contact_info.email || contact_info.email.trim() === "") {
+      toast.error("Email is required");
+      return false;
+    }
+    
+    if (!contact_info.phone || contact_info.phone.trim() === "") {
+      toast.error("Phone number is required");
+      return false;
+    }
+    
+    if (!location.address || location.address.trim() === "") {
+      toast.error("Address is required");
+      return false;
+    }
+    
+    return true;
+  };
+
+  const validateTastingInfo = () => {
+    if (formData.tasting_info.length === 0) {
+      toast.error("At least one tasting must be added");
+      return false;
+    }
+
+    for (let i = 0; i < formData.tasting_info.length; i++) {
+      const tasting = formData.tasting_info[i];
+      
+      if (!tasting.tasting_title || tasting.tasting_title.trim() === "") {
+        toast.error(`Tasting #${i + 1}: Tasting title is required`);
+        return false;
+      }
+      
+      if (!tasting.tasting_description || tasting.tasting_description.trim() === "") {
+        toast.error(`Tasting #${i + 1}: Tasting description is required`);
+        return false;
+      }
+      
+      if (!tasting.tasting_price || tasting.tasting_price <= 0) {
+        toast.error(`Tasting #${i + 1}: Tasting price must be greater than 0`);
+        return false;
+      }
+      
+      if (!tasting.available_times || tasting.available_times.length === 0) {
+        toast.error(`Tasting #${i + 1}: At least one available time must be selected`);
+        return false;
+      }
+      
+      if (!tasting.wine_types || tasting.wine_types.length === 0) {
+        toast.error(`Tasting #${i + 1}: At least one wine type must be selected`);
+        return false;
+      }
+      
+      if (!tasting.special_features || tasting.special_features.length === 0) {
+        toast.error(`Tasting #${i + 1}: At least one special feature must be selected`);
+        return false;
+      }
+      
+      if (!tasting.ava || tasting.ava.trim() === "") {
+        toast.error(`Tasting #${i + 1}: AVA selection is required`);
+        return false;
+      }
+      
+      // Check if there are any images (either existing or newly uploaded)
+      const hasExistingImages = tasting.images && tasting.images.length > 0;
+      const hasNewImages = tastingImages[i] && tastingImages[i].length > 0;
+      
+      if (!hasExistingImages && !hasNewImages) {
+        toast.error(`Tasting #${i + 1}: At least one image is required`);
+        return false;
+      }
+    }
+    
+    return true;
+  };
+
+  const handleNext = () => {
+    if (activeStep === 0 && !validateBasicInfo()) {
+      return;
+    }
+    setActiveStep((prev) => prev + 1);
+  };
+  
   const handleBack = () => setActiveStep((prev) => prev - 1);
 
   const handleSubmit = async () => {
+    // Validate both steps before submitting
+    if (!validateBasicInfo()) {
+      return;
+    }
+    
+    if (!validateTastingInfo()) {
+      return;
+    }
+    
     setLoading(true);
     try {
       // Collect all files from global uploads and individual tastings
