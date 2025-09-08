@@ -12,8 +12,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
     const user = await User.findById(userId);
-    if (!user || user.role !== "winery") {
-      return NextResponse.json({ message: "Forbidden: Only winery users can create a winery." }, { status: 403 });
+    if (!user || user.role !== "winery" && user.role !== "admin") {
+      return NextResponse.json({ message: "Forbidden: Only winery or admin users can create a winery." }, { status: 403 });
     }
     const data = await req.json();
     const winery = await Winery.create({ ...data, owner: userId });
