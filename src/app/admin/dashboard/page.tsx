@@ -207,7 +207,7 @@ export default function Dashboard() {
 
       {/* Pagination Controls */}
       {totalPages > 1 && (
-        <div className="mt-4 flex justify-center items-center gap-4">
+        <div className="mt-4 mb-12 sm:mb-0 flex justify-center items-center gap-4">
           <button className="btn btn-sm" disabled={page === 1} onClick={() => setPage((prev) => Math.max(prev - 1, 1))}>
             Previous
           </button>
