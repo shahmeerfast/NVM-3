@@ -72,7 +72,7 @@ export default function Dashboard() {
 
       <h1>Bookings</h1>
       <hr />
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto pb-10">
         <table className="min-w-full border-collapse border border-gray-200 rounded-lg shadow-md bg-white">
           <thead className="bg-gray-200 text-gray-700">
             <tr>
@@ -203,11 +203,8 @@ export default function Dashboard() {
             )}
           </tbody>
         </table>
-      </div>
-
-      {/* Pagination Controls */}
-      {totalPages > 1 && (
-        <div className="mt-4 mb-12 sm:mb-0 flex justify-center items-center gap-4">
+        {totalPages > 1 && (
+        <div className="mt-4  pb-4  sm:mb-0  flex justify-center items-center gap-4">
           <button className="btn btn-sm" disabled={page === 1} onClick={() => setPage((prev) => Math.max(prev - 1, 1))}>
             Previous
           </button>
@@ -223,6 +220,10 @@ export default function Dashboard() {
           </button>
         </div>
       )}
+      </div>
+
+      {/* Pagination Controls */}
+
 
       {/* Booking Details Modal */}
       {modalOpen && selectedBooking && (
