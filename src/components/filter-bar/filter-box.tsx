@@ -268,7 +268,7 @@ const Filter = ({ wineries, onFilterApply }: FilterProps) => {
               min="0"
               max="200"
               value={filters.tastingPrice || 200}
-              onChange={(e) => handleFilterChange({ target: { name: e.target.name, value: Number(e.target.value) } })}
+              onChange={(e) => handleFilterChange(e.target.name, Number(e.target.value))}
               className="range range-primary w-full"
               aria-label="Select tasting price range"
             />
