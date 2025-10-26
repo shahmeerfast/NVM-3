@@ -15,20 +15,21 @@ interface CheckoutSessionRequest {
 }
 
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
 export async function POST(req: Request) {
   try {
+    await dbConnect();
+    const { bookData, line_items, success_url, cancel_url, metadata }: CheckoutSessionRequest = await req.json();
+
     const stripeKey = process.env.STRIPE_SECRET_KEY;
     if (!stripeKey) {
       return NextResponse.json({ message: "Stripe key not configured" }, { status: 500 });
     }
     
-    // Lazy load Stripe only when needed
-    const { default: Stripe } = await import('stripe');
+    // Lazy load Stripe only at runtime
+    const Stripe = (await import('stripe')).default;
     const stripe = new Stripe(stripeKey);
-    
-    await dbConnect();
-    const { bookData, line_items, success_url, cancel_url, metadata }: CheckoutSessionRequest = await req.json();
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
@@ -42,8 +43,6 @@ export async function POST(req: Request) {
     const userId = await getUserIdFromToken();
     if (!userId) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
-    await dbConnect();
-
     if (!Array.isArray(bookData) || bookData.length === 0) {
       return NextResponse.json({ message: "Invalid booking bookData" }, { status: 400 });
     }
@@ -54,7 +53,7 @@ export async function POST(req: Request) {
     }
 
     const booking = new BookingModel({ userId, payment_method: "pay_stripe" });
-    booking.wineries = bookData.map((winery) => ({
+    booking.wineries = bookData.map((winery: any) => ({
       wineryId: winery.wineryId,
       datetime: winery.dateTime,
       tasting: winery.tasting,
@@ -64,13 +63,13 @@ export async function POST(req: Request) {
     await booking.save();
 
     for (const winery of bookData) {
-      const wineryDetails = await WineryModel.findById(winery.wineryId).select("name contact_info.email");
+      const wineryDetails = await WineryModel.findById((winery as any).wineryId).select("name contact_info.email");
       if (wineryDetails) {
         await sendBookingEmails(
           booking.toJSON(),
           {
-            wineryId: winery.wineryId,
-            datetime: winery.dateTime,
+            wineryId: (winery as any).wineryId,
+            datetime: (winery as any).dateTime,
             wineryName: wineryDetails.name,
             wineryEmail: wineryDetails.contact_info?.email,
           },
@@ -78,7 +77,7 @@ export async function POST(req: Request) {
           "pending"
         );
       } else {
-        console.warn(`Winery not found for ID: ${winery.wineryId}`);
+        console.warn(`Winery not found for ID: ${(winery as any).wineryId}`);
       }
     }
 
