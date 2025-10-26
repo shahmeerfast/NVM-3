@@ -3,6 +3,8 @@ import { dbConnect } from "@/lib/dbConnect";
 import User from "@/models/user.model";
 import { getUserIdFromToken } from "@/lib/auth";
 
+export const dynamic = 'force-dynamic';
+
 export async function PUT(req: NextRequest) {
   try {
     const userId = await getUserIdFromToken();

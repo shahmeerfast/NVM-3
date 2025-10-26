@@ -7,6 +7,7 @@ import { Types } from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
 import { sendBookingEmails } from "@/lib/email";
 
+export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
   try {

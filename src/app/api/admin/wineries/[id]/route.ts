@@ -4,6 +4,8 @@ import { NextResponse } from "next/server";
 import { getUserIdFromToken } from "@/lib/auth";
 import User from "@/models/user.model";
 
+export const dynamic = 'force-dynamic';
+
 export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
   await dbConnect();
 

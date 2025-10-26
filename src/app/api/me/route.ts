@@ -4,6 +4,8 @@ import { getUserIdFromToken } from "@/lib/auth";
 import User from "@/models/user.model";
 import { Types } from "mongoose";
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     await dbConnect();

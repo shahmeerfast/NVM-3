@@ -1,6 +1,8 @@
 import BookingModel from "@/models/booking.model";
 import { NextResponse } from "next/server";
 
+export const dynamic = 'force-dynamic';
+
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string; status: string }> }) {
   const { id: bookingId, status } = await params;
   console.log({ bookingId, status });

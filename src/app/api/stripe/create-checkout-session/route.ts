@@ -17,6 +17,8 @@ interface CheckoutSessionRequest {
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(req: Request) {
   try {
     await dbConnect();
