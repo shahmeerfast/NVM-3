@@ -1,6 +1,5 @@
 import UserModel from "@/models/user.model";
 import { NextResponse } from "next/server";
-import Stripe from "stripe";
 import { dbConnect } from "@/lib/dbConnect";
 import { sendBookingEmails } from "@/lib/email";
 import WineryModel from "@/models/winery.model";
@@ -8,7 +7,7 @@ import { getUserIdFromToken } from "@/lib/auth";
 import BookingModel from "@/models/booking.model";
 
 interface CheckoutSessionRequest {
-  line_items: Stripe.Checkout.SessionCreateParams.LineItem[];
+  line_items: any[];
   success_url: string;
   cancel_url: string;
   metadata: { itinerary: string };
@@ -19,7 +18,14 @@ export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {
   try {
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
+    const stripeKey = process.env.STRIPE_SECRET_KEY;
+    if (!stripeKey) {
+      return NextResponse.json({ message: "Stripe key not configured" }, { status: 500 });
+    }
+    
+    // Lazy load Stripe only when needed
+    const { default: Stripe } = await import('stripe');
+    const stripe = new Stripe(stripeKey);
     
     await dbConnect();
     const { bookData, line_items, success_url, cancel_url, metadata }: CheckoutSessionRequest = await req.json();
