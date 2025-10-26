@@ -15,12 +15,12 @@ interface CheckoutSessionRequest {
   bookData: {};
 }
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
-
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {
   try {
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
+    
     await dbConnect();
     const { bookData, line_items, success_url, cancel_url, metadata }: CheckoutSessionRequest = await req.json();
 
