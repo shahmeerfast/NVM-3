@@ -14,29 +14,60 @@ export default function ItinerarySummary({ wineries, onConfirm }: ItinerarySumma
   useEffect(() => {
     const calculateTotalPrice = () => {
       return wineries.reduce((total, winery) => {
-        console.log("winery", winery);
+        console.log("winery payment_method:", winery.payment_method);
+        console.log("winery payment_method type:", winery.payment_method?.type);
         let wineryCost = 0;
         const bookingDetails = winery.bookingDetails;
         const selectedTastingIndex = bookingDetails?.selectedTastingIndex || 0;
         const currentTastingInfo = winery.tasting_info?.[selectedTastingIndex];
 
-        // Add tasting price for the selected tasting
-        if (currentTastingInfo?.tasting_price) {
-          wineryCost += currentTastingInfo.tasting_price;
-        }
+        // Only calculate cost for wineries that require payment through the app
+        if (winery.payment_method?.type === "pay_stripe") {
+          // Add tasting price for the selected tasting
+          if (currentTastingInfo?.tasting_price) {
+            wineryCost += currentTastingInfo.tasting_price;
+          }
 
-        // Add food pairing prices if selected
-        if (bookingDetails?.foodPairings) {
-          wineryCost += bookingDetails.foodPairings.reduce((sum, pairing) => sum + pairing.price, 0);
-        }
+          // Add food pairing prices if selected
+          if (bookingDetails?.foodPairings) {
+            wineryCost += bookingDetails.foodPairings.reduce((sum, pairing) => sum + pairing.price, 0);
+          }
 
-        // Add tour prices if selected
-        if (bookingDetails?.tours) {
-          wineryCost += bookingDetails.tours.reduce((sum, tour) => sum + tour.price, 0);
+          // Add tour prices if selected
+          if (bookingDetails?.tours) {
+            wineryCost += bookingDetails.tours.reduce((sum, tour) => sum + tour.price, 0);
+          }
+          
+          // Add other features prices if selected
+          if (bookingDetails?.otherFeature) {
+            wineryCost += bookingDetails.otherFeature.reduce((sum, feature) => sum + feature.price, 0);
+          }
+        } else if (!winery.payment_method || typeof winery.payment_method === 'string') {
+          // Fallback for wineries without proper payment method structure
+          // Assume they use pay_stripe if no payment method is set
+          console.log("Winery without proper payment method, assuming pay_stripe:", winery.name);
+          
+          // Add tasting price for the selected tasting
+          if (currentTastingInfo?.tasting_price) {
+            wineryCost += currentTastingInfo.tasting_price;
+          }
+
+          // Add food pairing prices if selected
+          if (bookingDetails?.foodPairings) {
+            wineryCost += bookingDetails.foodPairings.reduce((sum, pairing) => sum + pairing.price, 0);
+          }
+
+          // Add tour prices if selected
+          if (bookingDetails?.tours) {
+            wineryCost += bookingDetails.tours.reduce((sum, tour) => sum + tour.price, 0);
+          }
+          
+          // Add other features prices if selected
+          if (bookingDetails?.otherFeature) {
+            wineryCost += bookingDetails.otherFeature.reduce((sum, feature) => sum + feature.price, 0);
+          }
         }
-        if (bookingDetails?.otherFeature) {
-          wineryCost += bookingDetails.otherFeature.reduce((sum, feature) => sum + feature.price, 0);
-        }
+        // For external booking and pay at winery, cost is 0 (handled externally)
 
         return total + wineryCost;
       }, 0);
@@ -47,11 +78,32 @@ export default function ItinerarySummary({ wineries, onConfirm }: ItinerarySumma
 
   const totalTime = wineries.length * 1.5;
 
+  const getPaymentMethodSummary = () => {
+    const stripeWineries = wineries.filter(w => w.payment_method?.type === "pay_stripe");
+    const externalWineries = wineries.filter(w => w.payment_method?.type === "external_booking");
+    const payAtWineryWineries = wineries.filter(w => w.payment_method?.type === "pay_winery");
+    const fallbackWineries = wineries.filter(w => !w.payment_method || typeof w.payment_method === 'string');
+
+    if (stripeWineries.length > 0 || fallbackWineries.length > 0) {
+      if (externalWineries.length === 0 && payAtWineryWineries.length === 0) {
+        return `Total to Pay in App: $${totalPrice.toFixed(2)}`;
+      } else {
+        return `Mixed Payment Methods - App Total: $${totalPrice.toFixed(2)}`;
+      }
+    } else if (externalWineries.length > 0 && stripeWineries.length === 0 && payAtWineryWineries.length === 0) {
+      return "Payment: External Booking Links";
+    } else if (payAtWineryWineries.length > 0 && stripeWineries.length === 0 && externalWineries.length === 0) {
+      return "Payment: Pay at Winery";
+    } else {
+      return `Mixed Payment Methods - App Total: $${totalPrice.toFixed(2)}`;
+    }
+  };
+
   return (
     <div className="card shadow-sm bg-white p-6 rounded-lg">
       <h2 className="text-xl font-semibold mb-4">Itinerary Summary</h2>
       <p>Total Wineries: {wineries.length}</p>
-      <p>Approximate Cost: ${totalPrice.toFixed(2)}</p>
+      <p className="font-semibold">{getPaymentMethodSummary()}</p>
 
       <div className="mt-4">
         <h3 className="text-sm font-semibold text-gray-700">Breakdown</h3>
@@ -111,10 +163,15 @@ export default function ItinerarySummary({ wineries, onConfirm }: ItinerarySumma
         <button
           onClick={onConfirm}
           className="btn btn-success w-full"
-          disabled={wineries.some((w) => !w.bookingDetails?.selectedTime)}
+          disabled={wineries.some((w) => !w.bookingDetails?.selectedTime) || wineries.length === 0}
         >
           Confirm Itinerary
         </button>
+        {wineries.some((w) => !w.bookingDetails?.selectedTime) && (
+          <div className="text-sm text-red-600 mt-2">
+            Please select a time for all wineries before confirming.
+          </div>
+        )}
       </div>
     </div>
   );

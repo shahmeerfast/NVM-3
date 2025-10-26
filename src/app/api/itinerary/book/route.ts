@@ -25,7 +25,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
 
-    const booking = new BookingModel({ userId, payment_method: "pay_winery" });
+    // Determine payment method from the first winery (assuming all wineries in itinerary have same payment method)
+    const firstWinery = data[0];
+    const paymentMethod = firstWinery?.payment_method || "pay_winery";
+    
+    const booking = new BookingModel({ userId, payment_method: paymentMethod });
     booking.wineries = data.map((winery) => ({
       wineryId: winery.wineryId,
       datetime: winery.dateTime,

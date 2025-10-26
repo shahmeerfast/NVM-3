@@ -1,6 +1,6 @@
 import { Range } from "react-range";
 import Select from "react-select";
-import { wineTypes, regions, timeOptions, specialFeatures } from "@/data/data";
+import { wineTypes, regions, timeOptions, specialFeatures, mountainAVAs, avaOrder, avaInfo } from "@/data/data";
 import React from "react";
 import { FaMapMarkerAlt } from "react-icons/fa";
 
@@ -18,6 +18,7 @@ type Filters = {
   time: string;
   specialFeatures: string[];
   numberOfPeople: [number, number];
+  mountainLocation: boolean;
 };
 
 interface FilterBlockProps {
@@ -39,7 +40,7 @@ export const FilterBlock = ({
     <>
       {/* Total Price Range Filter */}
       <div className="grid gap-4 mt-8 mb-5">
-        <label className="text-sm text-gray-900 font-extrabold">Tasting Price Range</label>
+        <label className="text-sm text-gray-900 font-extrabold">Price Range of Tasting</label>
         <Range
           step={10}
           min={0}
@@ -47,15 +48,11 @@ export const FilterBlock = ({
           values={filters.priceRange}
           onChange={(newValues: any) => handleFilterChange("priceRange", newValues)}
           renderTrack={({ props, children }) => (
-            <div {...props} className="w-full h-1 bg-neutral-300 rounded-full">
-              {React.Children.map(children, (child, index) =>
-                React.isValidElement(child) ? React.cloneElement(child, { key: index }) : child
-              )}
-            </div>
+            <div {...props} className="w-full h-1 bg-neutral-300 rounded-full">{children}</div>
           )}
           renderThumb={({ props }) => {
-            const { key, ...newProps } = props;
-            return <div key={key} {...newProps} className="w-4 h-4 bg-primary rounded-full shadow-lg focus:outline-none" />;
+            const { key, ...thumbProps } = props as any;
+            return <div key={key} {...thumbProps} className="w-4 h-4 bg-primary rounded-full shadow-lg focus:outline-none" />;
           }}
         />
         <div className="flex justify-between text-xs">
@@ -74,15 +71,11 @@ export const FilterBlock = ({
           values={filters.numberOfWines}
           onChange={(newValues) => handleFilterChange("numberOfWines", newValues)}
           renderTrack={({ props, children }) => (
-            <div {...props} className="w-full h-1 bg-neutral-300 rounded-full">
-              {React.Children.map(children, (child, index) =>
-                React.isValidElement(child) ? React.cloneElement(child, { key: index }) : child
-              )}
-            </div>
+            <div {...props} className="w-full h-1 bg-neutral-300 rounded-full">{children}</div>
           )}
           renderThumb={({ props }) => {
-            const { key, ...newProps } = props;
-            return <div {...newProps} className="w-4 h-4 bg-primary rounded-full shadow-lg focus:outline-none" />;
+            const { key, ...thumbProps } = props as any;
+            return <div key={key} {...thumbProps} className="w-4 h-4 bg-primary rounded-full shadow-lg focus:outline-none" />;
           }}
         />
         <div className="flex justify-between text-xs">
@@ -101,15 +94,11 @@ export const FilterBlock = ({
           values={filters.numberOfPeople}
           onChange={(newValues) => handleFilterChange("numberOfPeople", newValues)}
           renderTrack={({ props, children }) => (
-            <div {...props} className="w-full h-1 bg-neutral-300 rounded-full">
-              {React.Children.map(children, (child, index) =>
-                React.isValidElement(child) ? React.cloneElement(child, { key: index }) : child
-              )}
-            </div>
+            <div {...props} className="w-full h-1 bg-neutral-300 rounded-full">{children}</div>
           )}
           renderThumb={({ props }) => {
-            const { key, ...newProps } = props;
-            return <div {...newProps} className="w-4 h-4 bg-primary rounded-full shadow-lg focus:outline-none" />;
+            const { key, ...thumbProps } = props as any;
+            return <div key={key} {...thumbProps} className="w-4 h-4 bg-primary rounded-full shadow-lg focus:outline-none" />;
           }}
         />
         <div className="flex justify-between text-xs">
@@ -136,7 +125,7 @@ export const FilterBlock = ({
         </div>
       </div>
 
-      {/* AVA Filter */}
+      {/* AVA Filter with info box and ordered options */}
       <div className="mt-4">
         <label className="text-sm font-extrabold text-gray-900 flex items-center gap-1">
           American Viticultural Area (AVA)
@@ -145,7 +134,7 @@ export const FilterBlock = ({
         <Select
           menuPlacement="top"
           isMulti
-          options={[...regions.map((region) => ({ value: region, label: region }))]}
+          options={[...avaOrder.map((region) => ({ value: region, label: region }))]}
           value={filters.ava.map((ava) => ({ value: ava, label: ava }))}
           onChange={(selectedOptions) =>
             handleFilterChange(
@@ -156,6 +145,15 @@ export const FilterBlock = ({
           className="w-full mt-2 mb-0"
           classNamePrefix="select"
         />
+        {filters.ava.length > 0 && (
+          <div className="mt-2 p-2 rounded-md bg-base-200 text-[11px] sm:text-xs">
+            {filters.ava.map((selected) => (
+              <div key={selected} className="mb-1">
+                <strong>{selected}:</strong> {avaInfo[selected] || "Details coming soon."}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Time Filter */}
@@ -200,6 +198,27 @@ export const FilterBlock = ({
             ))}
           </div>
         )}
+      </div>
+
+      {/* Mountain Location Filter */}
+      <div className="mt-4">
+        <label className="text-sm text-gray-900 font-extrabold">Mountain Location</label>
+        <div className="mt-2">
+          <label className="flex items-center space-x-2 text-xs sm:text-sm">
+            <input
+              type="checkbox"
+              className="checkbox checkbox-primary"
+              checked={filters.mountainLocation}
+              onChange={(e) => handleFilterChange("mountainLocation", e.target.checked)}
+            />
+            <span>Only show mountain AVAs</span>
+          </label>
+          {filters.mountainLocation && (
+            <div className="mt-2 text-[11px] sm:text-xs text-gray-600">
+              Mountain AVAs: {mountainAVAs.join(", ")}
+            </div>
+          )}
+        </div>
       </div>
     </>
   );

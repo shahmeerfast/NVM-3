@@ -46,7 +46,7 @@ const initialState: Winery = {
   amenities: { virtual_sommelier: false, augmented_reality_tours: false, handicap_accessible: false },
   user_reviews: [],
   transportation: { uber_availability: false, lyft_availability: false, distance_from_user: 0 },
-  payment_method: "pay_winery",
+  payment_method: { type: "pay_winery" },
 };
 
 export default function WineryAdminStepperPage() {
@@ -68,7 +68,17 @@ export default function WineryAdminStepperPage() {
         .get(`/api/winery/${wineryId}`)
         .then((res) => {
           if (res.data && res.data.winery) {
-            setFormData(res.data.winery);
+            const wineryData = res.data.winery;
+            
+            // Migrate old payment_method format to new format
+            if (typeof wineryData.payment_method === 'string') {
+              wineryData.payment_method = { 
+                type: wineryData.payment_method,
+                external_booking_link: ''
+              };
+            }
+            
+            setFormData(wineryData);
           }
         })
         .catch(() => toast.error("Failed to load winery for editing."))
@@ -138,11 +148,6 @@ export default function WineryAdminStepperPage() {
       
       if (!tasting.wine_types || tasting.wine_types.length === 0) {
         toast.error(`Tasting #${i + 1}: At least one wine type must be selected`);
-        return false;
-      }
-      
-      if (!tasting.special_features || tasting.special_features.length === 0) {
-        toast.error(`Tasting #${i + 1}: At least one special feature must be selected`);
         return false;
       }
       

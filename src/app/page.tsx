@@ -20,7 +20,20 @@ export default function Home() {
 
   const fetchWineries = async () => {
     const response = await axios.get("/api/winery");
-    setWineries(response.data.wineries);
+    const wineriesData = response.data.wineries;
+    
+    // Migrate old payment_method format to new format for all wineries
+    const migratedWineries = wineriesData.map((winery: any) => {
+      if (typeof winery.payment_method === 'string') {
+        winery.payment_method = { 
+          type: winery.payment_method,
+          external_booking_link: ''
+        };
+      }
+      return winery;
+    });
+    
+    setWineries(migratedWineries);
   };
 
   useEffect(() => {

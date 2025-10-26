@@ -543,6 +543,11 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
             </div>
 
             <div className="form-control">
+              <label className="label">Available Slots</label>
+              <MultiDateTimePicker dates={availableSlotDates} onChange={updateSlotDates(index)} />
+            </div>
+
+            <div className="form-control">
               <label className="label">Number of Wines Per Tasting</label>
               <input
                 type="number"
@@ -583,12 +588,6 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
         </div>
     
                         </div>
-
-
-            <div className="form-control">
-              <label className="label">Available Slots</label>
-              <MultiDateTimePicker dates={availableSlotDates} onChange={updateSlotDates(index)} />
-            </div>
 
             <div className="form-control">
               <label className="label">
@@ -816,8 +815,11 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
               type="radio"
               name="paymentMethod"
               value="pay_winery"
-              checked={formData.payment_method === "pay_winery"}
-              onChange={(e) => setFormData((prev) => ({ ...prev, payment_method: e.target.value }))}
+              checked={formData.payment_method?.type === "pay_winery"}
+              onChange={(e) => setFormData((prev) => ({ 
+                ...prev, 
+                payment_method: { type: e.target.value as 'pay_winery' | 'pay_stripe' | 'external_booking' }
+              }))}
               className="radio"
             />
             <span className="ml-2">Pay at Winery</span>
@@ -827,13 +829,56 @@ export const TastingBookingForm: React.FC<TastingBookingFormProps> = ({
               type="radio"
               name="paymentMethod"
               value="pay_stripe"
-              checked={formData.payment_method === "pay_stripe"}
-              onChange={(e) => setFormData((prev) => ({ ...prev, payment_method: e.target.value }))}
+              checked={formData.payment_method?.type === "pay_stripe"}
+              onChange={(e) => setFormData((prev) => ({ 
+                ...prev, 
+                payment_method: { type: e.target.value as 'pay_winery' | 'pay_stripe' | 'external_booking' }
+              }))}
               className="radio"
             />
             <span className="ml-2">Pay in NVW App (Stripe)</span>
           </label>
+          <label className="flex items-center">
+            <input
+              type="radio"
+              name="paymentMethod"
+              value="external_booking"
+              checked={formData.payment_method?.type === "external_booking"}
+              onChange={(e) => setFormData((prev) => ({ 
+                ...prev, 
+                payment_method: { 
+                  type: e.target.value as 'pay_winery' | 'pay_stripe' | 'external_booking',
+                  external_booking_link: prev.payment_method?.external_booking_link || ''
+                }
+              }))}
+              className="radio"
+            />
+            <span className="ml-2">External Booking Link</span>
+          </label>
         </div>
+        
+        {/* External Booking Link Input - Only show when external_booking is selected */}
+        {formData.payment_method?.type === "external_booking" && (
+          <div className="mt-4">
+            <label className="label">External Booking Link</label>
+            <input
+              type="url"
+              placeholder="https://winery-booking-site.com/book"
+              className="input input-bordered w-full"
+              value={formData.payment_method?.external_booking_link || ""}
+              onChange={(e) => setFormData((prev) => ({
+                ...prev,
+                payment_method: {
+                  type: prev.payment_method?.type || "external_booking",
+                  external_booking_link: e.target.value
+                }
+              }))}
+            />
+            <div className="text-sm text-gray-600 mt-2">
+              When customers book, they will be redirected to this link for payment processing.
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="form-control">

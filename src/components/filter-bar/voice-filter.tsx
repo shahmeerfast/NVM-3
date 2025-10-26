@@ -78,16 +78,17 @@ export const VoiceFilter = () => {
         </div>
       )}
 
-      {/* Button to Start/Stop Recording */}
-      <div className="group">
+      {/* Button to Start/Stop Recording (inline inside bottom navbar) */}
+      <div className="group flex items-center justify-center">
         <button
           onMouseDown={startListening}
           onMouseUp={stopListening}
           onTouchStart={startListening}
           onTouchEnd={stopListening}
-          className={`flex absolute z-29 bottom-4 left-0 right-0 m-auto items-center justify-center w-[50px] h-[50px] bg-${
+          className={`flex items-center justify-center w-[50px] h-[50px] bg-${
             listening ? "red-600" : "wine-primary"
-          } text-white rounded-full shadow-lg transition-all duration-200 ease-in-out transform group-active:scale-[2]`}
+          } text-white rounded-full shadow-lg transition-all duration-200 ease-in-out transform active:scale-95`}
+          aria-label={listening ? "Stop voice search" : "Start voice search"}
         >
           <FaMicrophone size={20} />
         </button>

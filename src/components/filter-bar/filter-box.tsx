@@ -258,6 +258,23 @@ const Filter = ({ wineries, onFilterApply }: FilterProps) => {
           setIsFeaturesOpen={setIsFeaturesOpen}
         />
 
+        {/* Tasting Price Range Filter */}
+        <div className="space-y-4">
+          <label className="text-lg font-medium text-neutral">Price Range of Tasting</label>
+          <div className="relative">
+            <input
+              type="range"
+              name="tastingPrice"
+              min="0"
+              max="200"
+              value={filters.tastingPrice || 200}
+              onChange={(e) => handleFilterChange({ target: { name: e.target.name, value: Number(e.target.value) } })}
+              className="range range-primary w-full"
+              aria-label="Select tasting price range"
+            />
+          </div>
+        </div>
+
         <button
           className="flex-3 w-full flex items-center justify-center space-x-2 px-4 py-2 rounded-md border border-wine-primary text-wine-primary bg-transparent hover:bg-wine-primary hover:text-white hover:shadow-neumorphism transition duration-300 ease-in-out text-sm"
           onClick={() => setShowResetModal(true)}

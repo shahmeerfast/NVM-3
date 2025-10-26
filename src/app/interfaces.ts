@@ -93,6 +93,12 @@ export interface TastingInfo {
   other_features: { description: string; cost: number; feature_id?: string }[];
 }
 
+// PaymentMethod.ts
+export interface PaymentMethod {
+  type: 'pay_winery' | 'pay_stripe' | 'external_booking';
+  external_booking_link?: string;
+}
+
 // Winery.ts
 export interface Winery {
   _id?: string;
@@ -104,7 +110,7 @@ export interface Winery {
   amenities: Amenities;
   user_reviews: UserReview[];
   transportation: Transportation;
-  payment_method: string;
+  payment_method: PaymentMethod;
   food_pairing_options?: FoodPairingOption[];
   tours?: Tours;
   wine_details?: WineDetail[];

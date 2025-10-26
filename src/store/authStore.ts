@@ -7,7 +7,7 @@ interface AuthStore {
   loading: boolean;
   error: string | null;
   fetchUser: () => Promise<void>;
-  register: (data: { name: string; email: string; password: string }) => Promise<{ success: boolean; message?: string }>;
+  register: (data: { name: string; email: string; password: string; dateOfBirth?: Date }) => Promise<{ success: boolean; message?: string }>;
   login: (email: string, password: string) => Promise<{ success: boolean; message?: string }>;
   logout: () => Promise<void>;
 }

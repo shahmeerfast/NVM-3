@@ -1,11 +1,12 @@
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
 
-const SECRET = process.env.NEXT_PUBLIC_JWT_SECRET!;
+const SECRET = process.env.JWT_SECRET || process.env.NEXT_PUBLIC_JWT_SECRET || "";
 
 export function createToken(userId: string, role?: string) {
-  console.log({ userId, role });
-
+  if (!SECRET) {
+    throw new Error("JWT secret is not set. Please define JWT_SECRET in .env.local");
+  }
   return jwt.sign({ userId, role }, SECRET, { expiresIn: "7d" });
 }
 
@@ -25,6 +26,9 @@ export async function getUserIdFromToken() {
   if (!token) return null;
 
   try {
+    if (!SECRET) {
+      return null;
+    }
     const decoded = jwt.verify(token, SECRET) as { userId: string };
     return decoded.userId;
   } catch {

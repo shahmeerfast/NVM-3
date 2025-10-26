@@ -5,6 +5,7 @@ export interface IUser {
   name: string;
   email: string;
   password: string;
+  dateOfBirth?: Date;
   createdAt: Date;
   role: string;
   comparePassword(candidatePassword: string): Promise<boolean>;
@@ -15,6 +16,7 @@ const UserSchema = new Schema<IUser>(
     name: { type: String, required: true, trim: true },
     email: { type: String, required: true, unique: true, trim: true, lowercase: true },
     password: { type: String, required: true },
+    dateOfBirth: { type: Date },
     role: { type: String, default: "winery", enum: ["admin", "winery"] },
     createdAt: { type: Date, default: Date.now },
   },

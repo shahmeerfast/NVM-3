@@ -17,7 +17,7 @@ export default function WineryBookingCard({ winery, onUpdate, onRemove }: Winery
   const [selectedTastingIndex, setSelectedTastingIndex] = useState<number>(0);
   const [availableTimes, setAvailableTimes] = useState<string[]>([]);
   const [selections, setSelections] = useState({
-    tasting: false,
+    tasting: true, // Auto-select tasting by default
     foodPairings: [] as { name: string; price: number }[],
     tours: [] as { description: string; price: number }[],
     otherFeature: [] as { description: string; price: number }[],
@@ -174,7 +174,7 @@ export default function WineryBookingCard({ winery, onUpdate, onRemove }: Winery
 
         <div className="flex items-center justify-between text-sm text-gray-700 mt-2 gap-2">
           <span className="flex items-center gap-1">
-            💰 Tasting: ${currentTastingInfo?.tasting_price?.toFixed(2) ?? "N/A"}
+            ✅ Tasting: ${currentTastingInfo?.tasting_price?.toFixed(2) ?? "N/A"} (Selected)
           </span>
           <span className="flex items-center gap-1">
             ⏰ {currentTastingInfo?.available_times?.slice(0, 3).join(", ") ?? "No times available"}

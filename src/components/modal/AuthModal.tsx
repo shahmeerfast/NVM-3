@@ -11,7 +11,7 @@ interface ModalProps {
 
 const AuthModal = ({ setShowPopup, showLoginForm = false }: ModalProps) => {
   const [isLoginMode, setIsLoginMode] = useState(showLoginForm);
-  const [formData, setFormData] = useState({ fullName: "", email: "", password: "" });
+  const [formData, setFormData] = useState({ fullName: "", email: "", password: "", dateOfBirth: "" });
   const [showPassword, setShowPassword] = useState(false); // For toggling password visibility
   const { login, register, error, user } = useAuthStore();
 
@@ -34,6 +34,7 @@ const AuthModal = ({ setShowPopup, showLoginForm = false }: ModalProps) => {
         email: formData.email,
         password: formData.password,
         name: formData.fullName,
+        dateOfBirth: formData.dateOfBirth ? new Date(formData.dateOfBirth) : undefined,
       });
       if (response.success) {
         setShowPopup(false);
@@ -75,15 +76,29 @@ const AuthModal = ({ setShowPopup, showLoginForm = false }: ModalProps) => {
 
         <form className="flex flex-col space-y-4" onSubmit={handleSubmit}>
           {!isLoginMode && (
-            <input
-              type="text"
-              placeholder="Your Name"
-              name="fullName"
-              value={formData.fullName}
-              className="input input-bordered w-full text-neutral focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all py-3 px-4 rounded-xl shadow-md"
-              required
-              onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-            />
+            <>
+              <input
+                type="text"
+                placeholder="Your Name"
+                name="fullName"
+                value={formData.fullName}
+                className="input input-bordered w-full text-neutral focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all py-3 px-4 rounded-xl shadow-md"
+                required
+                onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+              />
+              <input
+                type="date"
+                placeholder="Date of Birth"
+                name="dateOfBirth"
+                value={formData.dateOfBirth}
+                className="input input-bordered w-full text-neutral focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all py-3 px-4 rounded-xl shadow-md"
+                required
+                onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
+              />
+              <div className="text-xs text-gray-600">
+                You must be 21 or older to book wine tastings and alcohol-related services.
+              </div>
+            </>
           )}
           <input
             type="email"

@@ -30,6 +30,7 @@ export async function GET(req: Request) {
     const total = await Winery.countDocuments();
     return NextResponse.json({ message: "sucess", wineries, total }, { status: 200 });
   } catch (error: any) {
-    return NextResponse.json({ message: error.message }, { status: 400 });
+    console.error("Error in GET /api/winery:", error);
+    return NextResponse.json({ message: error.message, error: error.toString() }, { status: 400 });
   }
 }

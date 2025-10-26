@@ -11,6 +11,9 @@ import WineryBookingCard from "@/components/cards/winery";
 import axios from "axios";
 import { useAuthStore } from "@/store/authStore";
 import { loadStripe } from "@stripe/stripe-js";
+import { isUser21OrOlder } from "@/lib/ageVerification";
+import { toast } from "react-toastify";
+import DateOfBirthModal from "@/components/modal/DateOfBirthModal";
 
 // Initialize Stripe with your publishable key
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "");
@@ -23,6 +26,7 @@ export default function ItineraryPage() {
   const [currentLocation, setCurrentLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const [loadingLocation, setLoadingLocation] = useState(false);
   const [loadingPayment, setLoadingPayment] = useState(false);
+  const [showDateOfBirthModal, setShowDateOfBirthModal] = useState(false);
   const { user } = useAuthStore();
   const router = useRouter();
 
@@ -71,7 +75,30 @@ export default function ItineraryPage() {
     });
   };
 const handleConfirmBooking = async () => {
-  if (!user) return setShowAuthModal(true);
+  console.log("Starting confirmation process...");
+  console.log("User:", user);
+  console.log("Itinerary:", itinerary);
+  
+  if (!user) {
+    console.log("No user found, showing auth modal");
+    return setShowAuthModal(true);
+  }
+
+  // Check age verification for alcohol-related bookings
+  console.log("Checking age verification...");
+  console.log("User date of birth:", user.dateOfBirth);
+  
+  if (user.dateOfBirth && !isUser21OrOlder(user.dateOfBirth)) {
+    console.log("User is under 21, blocking booking");
+    toast.error("You must be 21 or older to book wine tastings and alcohol-related services.");
+    return;
+  } else if (!user.dateOfBirth) {
+    console.log("User has no date of birth, showing age verification modal");
+    setShowDateOfBirthModal(true);
+    return;
+  }
+
+  console.log("Age verification passed");
 
   const data = itinerary.map((winery) => {
     const selectedTastingIndex = winery.bookingDetails?.selectedTastingIndex || 0;
@@ -87,12 +114,19 @@ const handleConfirmBooking = async () => {
   });
 
   try {
-    const requiresStripe = itinerary.some((winery) => winery?.payment_method === "pay_stripe");
+    console.log("Itinerary data:", itinerary);
+    console.log("Payment methods:", itinerary.map(w => ({ name: w.name, payment_method: w.payment_method })));
+    
+    const requiresStripe = itinerary.some((winery) => winery?.payment_method?.type === "pay_stripe");
+    const hasExternalBooking = itinerary.some((winery) => winery?.payment_method?.type === "external_booking");
+    
+    console.log("Requires Stripe:", requiresStripe);
+    console.log("Has External Booking:", hasExternalBooking);
 
     if (requiresStripe) {
       setLoadingPayment(true);
       const lineItems = itinerary
-        .filter((winery) => winery?.payment_method === "pay_stripe")
+        .filter((winery) => winery?.payment_method?.type === "pay_stripe")
         .map((winery) => {
           let totalCost = 0;
           const items = [];
@@ -108,6 +142,20 @@ const handleConfirmBooking = async () => {
           if (winery.bookingDetails?.foodPairings?.length) {
             totalCost += winery.bookingDetails.foodPairings.reduce((sum, foodItem) => {
               return foodItem.price ? sum + foodItem.price : sum;
+            }, 0);
+          }
+
+          // Add tour prices
+          if (winery.bookingDetails?.tours?.length) {
+            totalCost += winery.bookingDetails.tours.reduce((sum, tour) => {
+              return tour.price ? sum + tour.price : sum;
+            }, 0);
+          }
+
+          // Add other features prices
+          if (winery.bookingDetails?.otherFeature?.length) {
+            totalCost += winery.bookingDetails.otherFeature.reduce((sum, feature) => {
+              return feature.price ? sum + feature.price : sum;
             }, 0);
           }
 
@@ -151,8 +199,32 @@ const handleConfirmBooking = async () => {
         throw new Error("Stripe failed to initialize");
       }
     } else {
+      // Check if any wineries use external booking links
+      const hasExternalBooking = itinerary.some((winery) => winery?.payment_method?.type === "external_booking");
+      
+      if (hasExternalBooking) {
+        // Handle external booking links
+        const externalBookings = itinerary.filter((winery) => winery?.payment_method?.type === "external_booking");
+        
+        if (externalBookings.length > 0) {
+          // For external bookings, redirect to the winery's booking link
+          const firstExternalBooking = externalBookings[0];
+          if (firstExternalBooking.payment_method?.external_booking_link) {
+            // Still send confirmation to our system (no payment processing)
+            await axios.post("/api/itinerary/book", { data });
+            toast.success("Booking confirmed! Redirecting to winery booking page...");
+            window.open(firstExternalBooking.payment_method.external_booking_link, '_blank');
+            return;
+          }
+        }
+      }
+      
+      // Pay at winery - no payment processing needed
+      console.log("Processing pay at winery booking...");
       const response = await axios.post("/api/itinerary/book", { data });
+      console.log("Booking response:", response);
       if (response.status === 201) {
+        console.log("Booking successful, showing ride modal");
         setShowRideModal(true);
       }
     }
@@ -171,6 +243,11 @@ const handleConfirmBooking = async () => {
     setLoadingPayment(false);
   }
 };
+
+  const handleDateOfBirthSuccess = () => {
+    // Retry the booking process after date of birth is updated
+    handleConfirmBooking();
+  };
 
   const handleRideClick = async (service: "uber" | "lyft") => {
     if (!currentLocation) {
@@ -307,6 +384,11 @@ const handleConfirmBooking = async () => {
       </Modal>
 
       {showAuthModal && <AuthModal setShowPopup={setShowAuthModal} showLoginForm={true} />}
+      <DateOfBirthModal 
+        isOpen={showDateOfBirthModal}
+        onClose={() => setShowDateOfBirthModal(false)}
+        onSuccess={handleDateOfBirthSuccess}
+      />
     </div>
   );
 }
