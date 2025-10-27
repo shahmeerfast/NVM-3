@@ -196,29 +196,25 @@ export const FilterBlock = ({
                 <span>{feature}</span>
               </label>
             ))}
+            
+            {/* Mountain Location Filter - Now inside Special Features */}
+            <label className="flex items-center space-x-2 text-xs sm:text-sm">
+              <input
+                type="checkbox"
+                className="checkbox checkbox-primary"
+                checked={filters.mountainLocation}
+                onChange={(e) => handleFilterChange("mountainLocation", e.target.checked)}
+              />
+              <span>Only show mountain AVAs</span>
+            </label>
+            
+            {filters.mountainLocation && (
+              <div className="w-full mt-2 text-[11px] sm:text-xs text-gray-600">
+                Mountain AVAs: {mountainAVAs.join(", ")}
+              </div>
+            )}
           </div>
         )}
-      </div>
-
-      {/* Mountain Location Filter */}
-      <div className="mt-4">
-        <label className="text-sm text-gray-900 font-extrabold">Mountain Location</label>
-        <div className="mt-2">
-          <label className="flex items-center space-x-2 text-xs sm:text-sm">
-            <input
-              type="checkbox"
-              className="checkbox checkbox-primary"
-              checked={filters.mountainLocation}
-              onChange={(e) => handleFilterChange("mountainLocation", e.target.checked)}
-            />
-            <span>Only show mountain AVAs</span>
-          </label>
-          {filters.mountainLocation && (
-            <div className="mt-2 text-[11px] sm:text-xs text-gray-600">
-              Mountain AVAs: {mountainAVAs.join(", ")}
-            </div>
-          )}
-        </div>
       </div>
     </>
   );
