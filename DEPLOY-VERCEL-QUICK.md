@@ -82,3 +82,4 @@ That's it! 🎉
 - MongoDB setup: https://www.mongodb.com/cloud/atlas (Free tier available!)
 - Vercel docs: https://vercel.com/docs
 
+
