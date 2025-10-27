@@ -51,7 +51,7 @@ const AuthModal = ({ setShowPopup, showLoginForm = false }: ModalProps) => {
         <p className="text-center text-sm text-neutral mb-6">
           {isLoginMode
             ? "Enter your credentials to login"
-            : "Sign up to explore Napa Valley’s finest wineries or continue as a guest."}
+            : "Sign up to book Napa Valley's finest wineries or explore as a guest"}
         </p>
 
         <div className="flex gap-4 justify-center md:mb-8 mb-4">
