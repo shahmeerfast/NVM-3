@@ -3,6 +3,7 @@ import { dbConnect } from "@/lib/dbConnect";
 import User from "@/models/user.model";
 
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
 // CORS handler
 export async function OPTIONS(req: Request) {
